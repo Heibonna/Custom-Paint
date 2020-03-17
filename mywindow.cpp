@@ -22,6 +22,8 @@ MyWindow::MyWindow(QWidget *parent) :
     y0 = -1;
     x1 = -1;
     y1 = -1;
+    color = 'w';
+    on_cleanButton_clicked();
     color = 'b';
 }
 
@@ -37,9 +39,7 @@ void MyWindow::on_exitButton_clicked()
 
 void MyWindow::paintEvent(QPaintEvent*)
 {
-
     QPainter p(this);
-
     p.drawImage(poczX,poczY,*img);
 }
 
@@ -50,6 +50,7 @@ void MyWindow::on_cleanButton_clicked()
            paintPixels(j,i);
         }
     }
+    update();
 }
 
 void MyWindow::on_draw1Button_clicked()
@@ -92,6 +93,10 @@ void MyWindow::on_whiteButton_clicked(){
     color = 'w';
 }
 
+void MyWindow::on_circleButton_clicked(){
+    mode = 2;
+}
+
 void MyWindow::paintPixels(int x, int y){
     unsigned char *ptr;
     ptr = img->bits();
@@ -129,8 +134,6 @@ void MyWindow::paintPixels(int x, int y){
     else{
         std::cout << "Error: wrong color\n";
     }
-
-    update();
 }
 
 void MyWindow::rysuj1()
@@ -176,7 +179,7 @@ void MyWindow::mousePressEvent(QMouseEvent *event)
 {
     isPressed = true;
 
-    if(mode == 1){
+    if(mode == 1 || mode == 2){
         imgCopy = *img;
         x0 = event->x() - poczX;
         y0 = event->y() - poczY;
@@ -186,7 +189,7 @@ void MyWindow::mousePressEvent(QMouseEvent *event)
 void MyWindow::mouseMoveEvent(QMouseEvent *event){
     x1 = event->x() - poczX;
     y1 = event->y() - poczY;
-    std::cout << x1 << "," << y1 << std::endl;
+    //std::cout << x1 << "," << y1 << std::endl;
 
     if(mode == 0){
         if(isPressed){
@@ -201,6 +204,12 @@ void MyWindow::mouseMoveEvent(QMouseEvent *event){
             drawLine(event);
         }
     }
+    else if(mode == 2){
+        if(isPressed){
+            *img = imgCopy;
+            drawCircle(event);
+        }
+    }
     update();
 }
 
@@ -213,12 +222,27 @@ void MyWindow::mouseReleaseEvent(QMouseEvent *event){
         x1 = -1;
         y1 = -1;
     }
+    else if(mode == 2){
+        drawCircle(event);
+        x0 = -1;
+        y0 = -1;
+        x1 = -1;
+        y1 = -1;
+    }
+    update();
 }
 
 bool MyWindow::clickedIntoWindow(){
     if(((x0>=0)&&(x0<szer)&&(y0>=0)&&(y0<wys)&&(x1<szer)&&(x1>=0)&&(y1<wys)&&(y1>=0))
         || ((x0>=0)&&(x0<szer)&&(y0>=0)&&(y0<wys)&&(x1==-1)&&(x1==-1))
             || ((x1>=0)&&(x1<szer)&&(y1>=0)&&(y1<wys)&&(x0==-1)&&(x0==-1)))
+        return true;
+    else
+        return false;
+}
+
+bool MyWindow::clickedIntoRange(double range){
+    if(clickedIntoWindow()&&(x0+range<szer)&&(y0+range<wys)&&(x0-range>=0)&&(y0-range>=0))
         return true;
     else
         return false;
@@ -251,5 +275,32 @@ void MyWindow::drawLine(QMouseEvent *event){
             }
         }
     }
+    update();
 }
 
+void MyWindow::drawCircle(QMouseEvent *event){
+    x1 = event->x() - poczX;
+    y1 = event->y() - poczY;
+
+    int x, y;
+    double r = sqrt(pow(x1-x0, 2.0) + pow(y1-y0, 2.0));
+
+    //std::cout << "!!!r(" << r << ") "<< std::endl;
+    //std::cout << "!!!xy0(" << x0 << "," << y0 << ")"<< std::endl;
+    //std::cout << "!!!xy1(" << x1 << "," << y1 << ")"<< std::endl;
+
+    if(clickedIntoRange(r)){
+        for(x = 0; x < r; x++){
+            y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
+            std::cout << "xy1(" << x << "," << y << ")"<< std::endl;
+            paintPixels(x0 + x, y0 + y);
+            paintPixels(x0 - x, y0 + y);
+            paintPixels(x0 + x, y0 - y);
+            paintPixels(x0 - x, y0 - y);
+            paintPixels(x0 + y, y0 + x);
+            paintPixels(x0 + y, y0 - x);
+            paintPixels(x0 - y, y0 + x);
+            paintPixels(x0 - y, y0 - x);
+        }
+    }
+}

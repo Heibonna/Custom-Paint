@@ -44,8 +44,8 @@ private:
     int poczX;
     int poczY;
     int isPressed;
-    char color; //black,white,red,green,blue
-    int mode;
+    char color;     //black,white,red,green,blue
+    int mode;       //0-pen, 1-line, 2-circle
 
     int x0, y0, x1, y1;
 
@@ -65,9 +65,12 @@ private slots:
     void on_redButton_clicked();
     void on_greenButton_clicked();
     void on_blueButton_clicked();
+    void on_circleButton_clicked();
 
     bool clickedIntoWindow();
+    bool clickedIntoRange(double);
     void drawLine(QMouseEvent *event);
+    void drawCircle(QMouseEvent *event);
     void paintPixels(int, int);
 
     void mousePressEvent(QMouseEvent *event);

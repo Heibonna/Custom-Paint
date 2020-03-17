@@ -102,6 +102,19 @@
       <string>Line</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="circleButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Circle</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="exitButton">
     <property name="geometry">
