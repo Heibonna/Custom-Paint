@@ -10,3 +10,6 @@ int main(int argc, char *argv[]){
 
     return a.exec();
 }
+
+//ideas:
+//step back/step forward/filling on|off

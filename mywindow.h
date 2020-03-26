@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include <QMainWindow>
 // Klasa QMainWindow posiada swoj wlasny layout.
@@ -20,6 +21,8 @@
 
 #include <QMouseEvent>
 // klikniecia, ruch myszka itp.
+
+#include <QSpinBox>
 
 namespace Ui {
     class MyWindow;
@@ -45,13 +48,27 @@ private:
     int poczY;
     int isPressed;
     char color;     //black,white,red,green,blue
-    int mode;       //0-pen, 1-line, 2-circle
+    int mode;       //0-pen, 1-line, 2-circle, 3-polygon
+    int polygonVertices;
 
     int x0, y0, x1, y1;
 
     void czysc();
     void rysuj1();
     void rysuj2();
+
+    void paintPixels(int, int);
+    bool clickedIntoWindow(std::pair<int, int>);
+    bool clickedIntoWindow();
+    bool clickedIntoRange(double);
+    void drawLine();
+    void drawCircle();
+    void drawPolygon();
+
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent*);
 
 private slots:
     void on_draw2Button_clicked();
@@ -66,17 +83,10 @@ private slots:
     void on_greenButton_clicked();
     void on_blueButton_clicked();
     void on_circleButton_clicked();
+    void on_polygonButton_clicked();
+    void on_spinBox_valueChanged(int);
 
-    bool clickedIntoWindow();
-    bool clickedIntoRange(double);
-    void drawLine(QMouseEvent *event);
-    void drawCircle(QMouseEvent *event);
-    void paintPixels(int, int);
 
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void paintEvent(QPaintEvent*);
 };
 
 #endif // MYWINDOW_H
