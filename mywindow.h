@@ -50,6 +50,7 @@ private:
     char color;     //black,white,red,green,blue
     int mode;       //0-pen, 1-line, 2-circle, 3-polygon
     int polygonVertices;
+    bool filling;
 
     int x0, y0, x1, y1;
 
@@ -85,8 +86,7 @@ private slots:
     void on_circleButton_clicked();
     void on_polygonButton_clicked();
     void on_spinBox_valueChanged(int);
-
-
+    void on_fillingBox_stateChanged(int);
 };
 
 #endif // MYWINDOW_H

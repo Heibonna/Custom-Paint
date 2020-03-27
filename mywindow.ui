@@ -286,7 +286,7 @@
     <property name="title">
      <string>Settings</string>
     </property>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="fillingBox">
      <property name="geometry">
       <rect>
        <x>0</x>

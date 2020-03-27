@@ -26,6 +26,7 @@ MyWindow::MyWindow(QWidget *parent) :
     on_cleanButton_clicked();
     color = 'b';
     polygonVertices = 4;
+    filling = false;
 }
 
 MyWindow::~MyWindow()
@@ -102,8 +103,15 @@ void MyWindow::on_polygonButton_clicked(){
     mode = 3;
 }
 
-void MyWindow::on_spinBox_valueChanged(int i){
-    polygonVertices = i;
+void MyWindow::on_spinBox_valueChanged(int value){
+    polygonVertices = value;
+}
+
+void MyWindow::on_fillingBox_stateChanged(int state){
+    if(state)
+        filling = true;
+    else
+        filling = false;
 }
 
 void MyWindow::paintPixels(int x, int y){
@@ -301,17 +309,30 @@ void MyWindow::drawCircle(){
     double r = sqrt(pow(x1-x0, 2.0) + pow(y1-y0, 2.0));
 
     if(clickedIntoRange(r)){
-        for(x = 0; x < r; x++){
-            y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
-            std::cout << "xy1(" << x << "," << y << ")"<< std::endl;
-            paintPixels(x0 + x, y0 + y);
-            paintPixels(x0 - x, y0 + y);
-            paintPixels(x0 + x, y0 - y);
-            paintPixels(x0 - x, y0 - y);
-            paintPixels(x0 + y, y0 + x);
-            paintPixels(x0 + y, y0 - x);
-            paintPixels(x0 - y, y0 + x);
-            paintPixels(x0 - y, y0 - x);
+        if(!filling || isPressed){
+            for(x = 0; x < r; x++){
+                y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
+                paintPixels(x0 + x, y0 + y);
+                paintPixels(x0 - x, y0 + y);
+                paintPixels(x0 + x, y0 - y);
+                paintPixels(x0 - x, y0 - y);
+                paintPixels(x0 + y, y0 + x);
+                paintPixels(x0 + y, y0 - x);
+                paintPixels(x0 - y, y0 + x);
+                paintPixels(x0 - y, y0 - x);
+            }
+        }
+        else{
+            for(int x = 0; x < r; x++){
+                for(int y = 0; y < r; y++){
+                    if(y*y + x*x <= r*r){
+                        paintPixels(x0 + x, y0 + y);
+                        paintPixels(x0 - x, y0 + y);
+                        paintPixels(x0 + x, y0 - y);
+                        paintPixels(x0 - x, y0 - y);
+                    }
+                }
+            }
         }
     }
 }
