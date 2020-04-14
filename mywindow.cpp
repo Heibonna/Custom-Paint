@@ -1,4 +1,4 @@
-#include "mywindow.h"
+﻿#include "mywindow.h"
 #include "ui_mywindow.h"
 
 MyWindow::MyWindow(QWidget *parent) :
@@ -22,11 +22,16 @@ MyWindow::MyWindow(QWidget *parent) :
     y0 = -1;
     x1 = -1;
     y1 = -1;
+
     color = 'w';
     on_cleanButton_clicked();
     color = 'b';
+
     polygonVertices = 4;
+
     filling = false;
+    switcher = false;
+    clickedBefore = false;
 }
 
 MyWindow::~MyWindow()
@@ -52,6 +57,9 @@ void MyWindow::on_cleanButton_clicked()
            paintPixels(j,i);
         }
     }
+    backgroundColor = color;
+    if(!control_points.empty())
+        control_points.clear();
     update();
 }
 
@@ -68,10 +76,12 @@ void MyWindow::on_draw2Button_clicked()
 }
 
 void MyWindow::on_penButton_clicked(){
+    updateBezierInterface();
     mode = 0;
 }
 
 void MyWindow::on_lineButton_clicked(){
+    updateBezierInterface();
     mode = 1;
 }
 
@@ -96,10 +106,12 @@ void MyWindow::on_whiteButton_clicked(){
 }
 
 void MyWindow::on_circleButton_clicked(){
+    updateBezierInterface();
     mode = 2;
 }
 
 void MyWindow::on_polygonButton_clicked(){
+    updateBezierInterface();
     mode = 3;
 }
 
@@ -113,6 +125,47 @@ void MyWindow::on_fillingBox_stateChanged(int state){
     else
         filling = false;
 }
+
+void  MyWindow::on_addBezier_clicked(){
+    updateBezierInterface();
+
+    mode = 4;
+
+    if(!control_points.empty() && control_points.back().size() != 4)
+        control_points.back().clear();
+}
+
+void  MyWindow::on_modifyBezier_clicked(){
+    mode = 5;
+
+    if(!control_points.empty() && control_points.back().size() != 4)
+        control_points.back().clear();
+
+    if(!clickedBefore){
+        switcher = true;
+        bezierInterface();
+        update();
+    }
+    clickedBefore = true;
+}
+
+void  MyWindow::on_deleteBezier_clicked(){
+    mode = 6;
+
+    if(!control_points.empty() && control_points.back().size() != 4)
+        control_points.back().clear();
+
+    if(!clickedBefore){
+        switcher = true;
+        bezierInterface();
+        update();
+    }
+    clickedBefore = true;
+}
+
+
+////////////////////////////////////////////////////
+
 
 void MyWindow::paintPixels(int x, int y){
     unsigned char *ptr;
@@ -192,14 +245,15 @@ void MyWindow::rysuj2()
         }
 }
 
-void MyWindow::mousePressEvent(QMouseEvent *event)
-{
-    isPressed = true;
+/////mouse tracking
 
-    imgCopy = *img;
+void MyWindow::mousePressEvent(QMouseEvent *event){
+    isPressed = true;
 
     x0 = event->x() - poczX;
     y0 = event->y() - poczY;
+
+    imgCopy = *img;
 }
 
 void MyWindow::mouseMoveEvent(QMouseEvent *event){
@@ -246,6 +300,18 @@ void MyWindow::mouseReleaseEvent(QMouseEvent *event){
         drawCircle();
     else if(mode == 3)
         drawPolygon();
+    else if(mode == 4)
+        addControlPoint();
+    else if(mode == 5 && clickedIntoWindow() && !control_points.empty()){
+        *img = imgEditor;
+        modifyBezier();
+        clickedBefore = false;
+    }
+    else if(mode == 6 && clickedIntoWindow() && !control_points.empty()){
+        *img = imgEditor;
+        deleteBezier();
+        clickedBefore = false;
+    }
 
     x0 = -1;
     y0 = -1;
@@ -254,6 +320,8 @@ void MyWindow::mouseReleaseEvent(QMouseEvent *event){
 
     update();
 }
+
+/////exceptions
 
 bool MyWindow::clickedIntoWindow(){
     if(clickedIntoWindow({x0, y0}) && clickedIntoWindow({x1, y1}))
@@ -269,7 +337,7 @@ bool MyWindow::clickedIntoWindow(std::pair<int, int> P){
         return false;
 }
 
-bool MyWindow::clickedIntoRange(double range){
+bool MyWindow::clickedIntoWindow(double range){
     if(clickedIntoWindow({x0+range, y0+range}) && clickedIntoWindow({x0-range, y0-range})
             && clickedIntoWindow({x0+range, y0-range}) && clickedIntoWindow({x0-range, y0+range}))
         return true;
@@ -277,25 +345,27 @@ bool MyWindow::clickedIntoRange(double range){
         return false;
 }
 
-void MyWindow::drawLine(){
-    if(clickedIntoWindow()){
+/////draw
+
+void MyWindow::drawLine(std::pair<int,int> p1, std::pair<int,int> p2){
+    if(clickedIntoWindow(p2)){
         float a, b;
-        if(x0 == x1){
-            for(int y = y0; y != y1; y += (y0 < y1 ? 1 : -1))
-                paintPixels(x0, y);
+        if(p1.first == p2.first){
+            for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1))
+                paintPixels(p1.first, y);
         }
         else{
-            a = float(y0 - y1)/(x0 - x1);
-            b = y0 - a * x0;
+            a = float(p1.second - p2.second)/(p1.first - p2.first);
+            b = p1.second - a * p1.first;
 
             if(a <= 1 && a >= -1){
-                for(int x = x0; x != x1; x += (x0 < x1 ? 1 : -1)){
+                for(int x = p1.first; x != p2.first; x += (p1.first < p2.first ? 1 : -1)){
                     int y = a*x+b;
                     paintPixels(x, y);
                 }
             }
             else{
-                for(int y = y0; y != y1; y += (y0 < y1 ? 1 : -1)){
+                for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1)){
                     int x = (y-b)/a;
                     paintPixels(x, y);
                 }
@@ -304,11 +374,15 @@ void MyWindow::drawLine(){
     }
 }
 
+void MyWindow::drawLine(){
+    drawLine({x0,y0},{x1,y1});
+}
+
 void MyWindow::drawCircle(){
     int x, y;
     double r = sqrt(pow(x1-x0, 2.0) + pow(y1-y0, 2.0));
 
-    if(clickedIntoRange(r)){
+    if(clickedIntoWindow(r)){
         if(!filling || isPressed){
             for(x = 0; x < r; x++){
                 y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
@@ -381,3 +455,196 @@ void MyWindow::drawPolygon(){
     x1 = copy[1].first;
     y1 = copy[1].second;
 }
+
+void MyWindow::addControlPoint(){
+    std::vector<std::pair<int,int>> vctr;
+    vctr.push_back({x1, y1});
+
+    if(control_points.empty()){
+        control_points.push_back(vctr);
+    }
+    else{
+        control_points.back().push_back({x1, y1});
+
+        if(control_points.back().size() == 4){
+            drawBezier(control_points.back());
+            control_points.push_back(vctr);
+        }
+    }
+}
+
+void MyWindow::drawBezier(std::vector<std::pair<int,int>> curve){
+    std::pair<int,int> p0, p1;
+    double t;
+    //std::cout << curve[0].first << "," << curve[0].second << "," << curve[1].first << "," << curve[1].second << "," <<  curve[2].first << "," << curve[2].second << "," << curve[3].first << "," << curve[3].second << std::lastl;
+
+    p0 = {0, 0};
+    p1 = {0, 0};
+
+    for(int i = 0;i <= 60; i++){
+        t = i/60.0;
+
+        if(p0.first != 0 && p0.second != 0){
+            p1.swap(p0);
+            p0.first = round(pow(1.0-t,3.0)*curve[0].first + 3*pow(1.0-t,2.0)*curve[1].first*t + 3*(1.0-t)*curve[2].first*t*t + curve[3].first*t*t*t);
+            p0.second = round(pow(1.0-t,3.0)*curve[0].second + 3*pow(1.0-t,2.0)*curve[1].second*t + 3*(1.0-t)*curve[2].second*t*t + curve[3].second*t*t*t);
+            drawLine(p0, p1);
+        }
+        else{
+            p0.first = round(pow(1.0-t,3.0)*curve[0].first + 3*pow(1.0-t,2.0)*curve[1].first*t + 3*(1.0-t)*curve[2].first*t*t + curve[3].first*t*t*t);
+            p0.second = round(pow(1.0-t,3.0)*curve[0].second + 3*pow(1.0-t,2.0)*curve[1].second*t + 3*(1.0-t)*curve[2].second*t*t + curve[3].second*t*t*t);
+        }
+        //std::cout << "p0,p1,t(" << p0.first << "," << p0.second << "," << p1.first << "," << p1.second << "," << t << ")"<< std::endl;
+    }
+}
+
+void MyWindow::bezierInterface(){
+    bool fillingTmp = filling;
+    filling = true;
+
+    if(switcher && !control_points.empty()){
+        imgEditor = *img;
+        char clr = color;
+
+        for(unsigned long i = 0; i < control_points.size(); i++){
+            for(unsigned long j = 0; j < control_points[i].size(); j++){
+                if(backgroundColor != 'r')
+                    color = 'r';
+                else
+                    color = 'g';
+
+                x0 = control_points[i][j].first;
+                y0 = control_points[i][j].second;
+                x1 = control_points[i][j].first+4;
+                y1 = control_points[i][j].second+4;
+                drawCircle();
+
+                color = clr;
+                x0 = control_points[i][j].first;
+                y0 = control_points[i][j].second;
+                x1 = control_points[i][j].first+2;
+                y1 = control_points[i][j].second+2;
+                drawCircle();
+            }
+        }
+        color = clr;
+    }
+    else if(!switcher){
+        *img = imgEditor;
+    }
+
+    filling = fillingTmp;
+}
+
+void MyWindow::updateBezierInterface(){
+    if(mode == 5 && switcher){
+        clickedBefore = false;
+        switcher = false;
+        bezierInterface();
+        update();
+    }
+}
+
+void MyWindow::modifyBezier(){
+    switcher = false;
+
+    char colortmp;
+
+    for(unsigned long  i=0; i < control_points.size()-1; i++){
+        for(unsigned long  j=0; j < control_points[i].size(); j++){
+            if(abs(control_points[i][j].first - x0) <= 5 && abs(control_points[i][j].second - y0) <= 5){
+            colortmp = color;
+            if(j == 3 && control_points.size() - 2 != i){
+                if(control_points[i][3] == control_points[i+1][0] && control_points[i+1].size() != 0){
+                    color = backgroundColor;
+                    drawBezier(control_points[i+1]);
+                    color = colortmp;
+
+                    control_points[i+1][0].first = x1;
+                    control_points[i+1][0].second = y1;
+                    drawBezier(control_points[i+1]);
+                }
+            }
+            color = backgroundColor;
+            drawBezier(control_points[i]);
+            color = colortmp;
+
+            control_points[i][j].first = x1;
+            control_points[i][j].second = y1;
+            drawBezier(control_points[i]);
+
+            return;
+            }
+        }
+    }
+}
+
+void MyWindow::deleteBezier(){
+    switcher = false;
+    unsigned long  min, max;
+    char colortmp = color;
+    for(unsigned long  i=0; i < control_points.size()-1; i++){
+        if(control_points[i].size() == 0)
+            continue;
+        for(unsigned long  j=0; j < control_points[i].size(); j++){
+            if(abs(control_points[i][j].first - x0) <= 5 && abs(control_points[i][j].second - y0) <= 5){
+                max = i-1;
+                do{
+                    max++;
+                    color = backgroundColor;
+                    drawBezier(control_points[max]);
+                    color = colortmp;
+                    if(control_points.size() == max+2 ||control_points[max+1].size() == 0)
+                        break;
+                }
+                while(control_points[max][3] == control_points[max+1][0]);
+                min = i;
+
+                if(j == 0 && control_points.size() != 1 && control_points[i][0] == control_points[i-1][3]){
+
+                    min--;
+                    color = backgroundColor;
+                    drawBezier(control_points[min]);
+                    color = colortmp;
+
+                    control_points[i-1][3] = control_points[i][1];
+                }
+                if(j == 3 && control_points.size() > i+2 && control_points[i+1].size() != 0){
+                    control_points[i][3] = control_points[i+1][1];
+                    control_points[i+1][0] = control_points[i+1][1];
+
+                    for(unsigned long  k=i+1; k < max; k++){
+                        for(unsigned long  l=1; l < control_points[k].size(); l++){
+                            if(l != 3)
+                                control_points[k][l] = control_points[k][l+1];
+                            else
+                                control_points[k][l] = control_points[k+1][0];
+
+                        }
+                    }
+                }
+                else{
+                    for(unsigned long  k=i; k <= max; k++){
+                        for(unsigned long  l=0; l < control_points[k].size(); l++){
+                            if(i == k && l < j)
+                                continue;
+                            else{
+                                if(l != 3)
+                                    control_points[k][l] = control_points[k][l+1];
+                                else if(control_points[k].size() == l+1 && k == max)
+                                    control_points[k].clear();
+                                else
+                                    control_points[k][l] = control_points[k+1][1];
+                            }
+                        }
+                    }
+                }
+                for(unsigned long  k=min; k <= max; k++)
+                    if(control_points[k].size() == 4)
+                        drawBezier(control_points[k]);
+                return;
+            }
+        }
+    }
+}
+

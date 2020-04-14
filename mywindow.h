@@ -38,34 +38,55 @@ public:
 
 private:
     Ui::MyWindow *ui;
-
     QImage *img;
     QImage imgCopy;
+    QImage imgEditor;
 
+    //window properties
     int szer;
     int wys;
     int poczX;
     int poczY;
+
+    //parameters
     int isPressed;
     char color;     //black,white,red,green,blue
-    int mode;       //0-pen, 1-line, 2-circle, 3-polygon
-    int polygonVertices;
+    char backgroundColor;
+    int mode;       //0-pen, 1-line, 2-circle, 3-polygon, 4-addBezier, 5-modifyBezier, 6-removeBezier
     bool filling;
+    bool switcher;
+    bool clickedBefore;
 
+    //specialised
     int x0, y0, x1, y1;
+    int polygonVertices;
+    std::vector<std::vector<std::pair<int,int>>> control_points;
+    //std::vector<std::pair<int, int>> curve;
 
+    //methods
     void czysc();
     void rysuj1();
     void rysuj2();
 
-    void paintPixels(int, int);
+    //verifications
     bool clickedIntoWindow(std::pair<int, int>);
     bool clickedIntoWindow();
-    bool clickedIntoRange(double);
+    bool clickedIntoWindow(double);
+
+    //tools
+    void paintPixels(int, int);
+    void drawLine(std::pair<int,int>,std::pair<int,int>);
     void drawLine();
     void drawCircle();
     void drawPolygon();
+    void addControlPoint();
+    void drawBezier(std::vector<std::pair<int,int>> curve);
+    void bezierInterface();
+    void updateBezierInterface();
+    void modifyBezier();
+    void deleteBezier();
 
+    //controlers
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -84,9 +105,12 @@ private slots:
     void on_greenButton_clicked();
     void on_blueButton_clicked();
     void on_circleButton_clicked();
+    void on_fillingBox_stateChanged(int);
     void on_polygonButton_clicked();
     void on_spinBox_valueChanged(int);
-    void on_fillingBox_stateChanged(int);
+    void on_addBezier_clicked();
+    void on_modifyBezier_clicked();
+    void on_deleteBezier_clicked();
 };
 
 #endif // MYWINDOW_H
