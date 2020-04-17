@@ -1,9 +1,9 @@
-﻿#include "mywindow.h"
-#include "ui_mywindow.h"
+﻿#include "mainWindow.h"
+#include "ui_mainWindow.h"
 
-MyWindow::MyWindow(QWidget *parent) :
+mainWindow::mainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MyWindow){
+    ui(new Ui::mainWindow){
 
     ui->setupUi(this);
 
@@ -34,23 +34,23 @@ MyWindow::MyWindow(QWidget *parent) :
     clickedBefore = false;
 }
 
-MyWindow::~MyWindow()
+mainWindow::~mainWindow()
 {
     delete ui;
 }
 
-void MyWindow::on_exitButton_clicked()
+void mainWindow::on_exitButton_clicked()
 {
     qApp->quit();
 }
 
-void MyWindow::paintEvent(QPaintEvent*)
+void mainWindow::paintEvent(QPaintEvent*)
 {
     QPainter p(this);
     p.drawImage(poczX,poczY,*img);
 }
 
-void MyWindow::on_cleanButton_clicked()
+void mainWindow::on_cleanButton_clicked()
 {
     for(int i=0; i<wys; i++){
         for(int j=0; j<szer; j++){
@@ -63,70 +63,70 @@ void MyWindow::on_cleanButton_clicked()
     update();
 }
 
-void MyWindow::on_draw1Button_clicked()
+void mainWindow::on_draw1Button_clicked()
 {
     rysuj1();
     update();
 }
 
-void MyWindow::on_draw2Button_clicked()
+void mainWindow::on_draw2Button_clicked()
 {
     rysuj2();
     update();
 }
 
-void MyWindow::on_penButton_clicked(){
+void mainWindow::on_penButton_clicked(){
     updateBezierInterface();
     mode = 0;
 }
 
-void MyWindow::on_lineButton_clicked(){
+void mainWindow::on_lineButton_clicked(){
     updateBezierInterface();
     mode = 1;
 }
 
-void MyWindow::on_redButton_clicked(){
+void mainWindow::on_redButton_clicked(){
     color = 'r';
 }
 
-void MyWindow::on_greenButton_clicked(){
+void mainWindow::on_greenButton_clicked(){
     color = 'g';
 }
 
-void MyWindow::on_blueButton_clicked(){
+void mainWindow::on_blueButton_clicked(){
     color = 'l';
 }
 
-void MyWindow::on_blackButton_clicked(){
+void mainWindow::on_blackButton_clicked(){
     color = 'b';
 }
 
-void MyWindow::on_whiteButton_clicked(){
+void mainWindow::on_whiteButton_clicked(){
     color = 'w';
 }
 
-void MyWindow::on_circleButton_clicked(){
+void mainWindow::on_circleButton_clicked(){
     updateBezierInterface();
     mode = 2;
 }
 
-void MyWindow::on_polygonButton_clicked(){
+void mainWindow::on_polygonButton_clicked(){
     updateBezierInterface();
     mode = 3;
 }
 
-void MyWindow::on_spinBox_valueChanged(int value){
+void mainWindow::on_spinBox_valueChanged(int value){
     polygonVertices = value;
 }
 
-void MyWindow::on_fillingBox_stateChanged(int state){
+void mainWindow::on_fillingBox_stateChanged(int state){
     if(state)
         filling = true;
     else
         filling = false;
 }
 
-void  MyWindow::on_addBezier_clicked(){
+void  mainWindow::on_addBezier_clicked(){
     updateBezierInterface();
 
     mode = 4;
@@ -135,7 +135,7 @@ void  MyWindow::on_addBezier_clicked(){
         control_points.back().clear();
 }
 
-void  MyWindow::on_modifyBezier_clicked(){
+void  mainWindow::on_modifyBezier_clicked(){
     mode = 5;
 
     if(!control_points.empty() && control_points.back().size() != 4)
@@ -149,7 +149,7 @@ void  MyWindow::on_modifyBezier_clicked(){
     clickedBefore = true;
 }
 
-void  MyWindow::on_deleteBezier_clicked(){
+void  mainWindow::on_deleteBezier_clicked(){
     mode = 6;
 
     if(!control_points.empty() && control_points.back().size() != 4)
@@ -167,46 +167,48 @@ void  MyWindow::on_deleteBezier_clicked(){
 ////////////////////////////////////////////////////
 
 
-void MyWindow::paintPixels(int x, int y){
+void mainWindow::paintPixels(int x, int y){
     unsigned char *ptr;
     ptr = img->bits();
 
-    if(color == 'b'){
-        ptr[szer*4*y + 4*x] = 0;
-        ptr[szer*4*y + 4*x + 1] = 0;
-        ptr[szer*4*y + 4*x + 2] = 0;
-        ptr[szer*4*y + 4*x + 3] = 255;
-    }
-    else if(color == 'w'){
-        ptr[szer*4*y + 4*x] = 255;
-        ptr[szer*4*y + 4*x + 1] = 255;
-        ptr[szer*4*y + 4*x + 2] = 255;
-        ptr[szer*4*y + 4*x + 3] = 255;
-    }
-    else if(color == 'l'){
-        ptr[szer*4*y + 4*x] = 255;
-        ptr[szer*4*y + 4*x + 1] = 0;
-        ptr[szer*4*y + 4*x + 2] = 0;
-        ptr[szer*4*y + 4*x + 3] = 255;
-    }
-    else if(color == 'r'){
-        ptr[szer*4*y + 4*x] = 0;
-        ptr[szer*4*y + 4*x + 1] = 0;
-        ptr[szer*4*y + 4*x + 2] = 255;
-        ptr[szer*4*y + 4*x + 3] = 255;
-    }
-    else if(color == 'g'){
-        ptr[szer*4*y + 4*x] = 0;
-        ptr[szer*4*y + 4*x + 1] = 255;
-        ptr[szer*4*y + 4*x + 2] = 0;
-        ptr[szer*4*y + 4*x + 3] = 255;
-    }
-    else{
-        std::cout << "Error: wrong color\n";
+    if(clickedIntoWindow({x,y})){
+        if(color == 'b'){
+            ptr[szer*4*y + 4*x] = 0;
+            ptr[szer*4*y + 4*x + 1] = 0;
+            ptr[szer*4*y + 4*x + 2] = 0;
+            ptr[szer*4*y + 4*x + 3] = 255;
+        }
+        else if(color == 'w'){
+            ptr[szer*4*y + 4*x] = 255;
+            ptr[szer*4*y + 4*x + 1] = 255;
+            ptr[szer*4*y + 4*x + 2] = 255;
+            ptr[szer*4*y + 4*x + 3] = 255;
+        }
+        else if(color == 'l'){
+            ptr[szer*4*y + 4*x] = 255;
+            ptr[szer*4*y + 4*x + 1] = 0;
+            ptr[szer*4*y + 4*x + 2] = 0;
+            ptr[szer*4*y + 4*x + 3] = 255;
+        }
+        else if(color == 'r'){
+            ptr[szer*4*y + 4*x] = 0;
+            ptr[szer*4*y + 4*x + 1] = 0;
+            ptr[szer*4*y + 4*x + 2] = 255;
+            ptr[szer*4*y + 4*x + 3] = 255;
+        }
+        else if(color == 'g'){
+            ptr[szer*4*y + 4*x] = 0;
+            ptr[szer*4*y + 4*x + 1] = 255;
+            ptr[szer*4*y + 4*x + 2] = 0;
+            ptr[szer*4*y + 4*x + 3] = 255;
+        }
+        else{
+            std::cout << "Error: wrong color\n";
+        }
     }
 }
 
-void MyWindow::rysuj1()
+void mainWindow::rysuj1()
 {
         unsigned char *ptr;
         ptr = img->bits();
@@ -226,7 +228,7 @@ void MyWindow::rysuj1()
         }
 }
 
-void MyWindow::rysuj2()
+void mainWindow::rysuj2()
 {
         unsigned char *ptr;
         ptr = img->bits();
@@ -247,7 +249,7 @@ void MyWindow::rysuj2()
 
 /////mouse tracking
 
-void MyWindow::mousePressEvent(QMouseEvent *event){
+void mainWindow::mousePressEvent(QMouseEvent *event){
     isPressed = true;
 
     x0 = event->x() - poczX;
@@ -256,7 +258,7 @@ void MyWindow::mousePressEvent(QMouseEvent *event){
     imgCopy = *img;
 }
 
-void MyWindow::mouseMoveEvent(QMouseEvent *event){
+void mainWindow::mouseMoveEvent(QMouseEvent *event){
     x1 = event->x() - poczX;
     y1 = event->y() - poczY;
     //std::cout << x1 << "," << y1 << std::endl;
@@ -289,7 +291,7 @@ void MyWindow::mouseMoveEvent(QMouseEvent *event){
     update();
 }
 
-void MyWindow::mouseReleaseEvent(QMouseEvent *event){
+void mainWindow::mouseReleaseEvent(QMouseEvent *event){
     x1 = event->x() - poczX;
     y1 = event->y() - poczY;
     isPressed = false;
@@ -323,23 +325,15 @@ void MyWindow::mouseReleaseEvent(QMouseEvent *event){
 
 /////exceptions
 
-bool MyWindow::clickedIntoWindow(){
+bool mainWindow::clickedIntoWindow(){
     if(clickedIntoWindow({x0, y0}) && clickedIntoWindow({x1, y1}))
         return true;
     else
         return false;
 }
 
-bool MyWindow::clickedIntoWindow(std::pair<int, int> P){
+bool mainWindow::clickedIntoWindow(std::pair<int, int> P){
     if(P.first >= 0 && P.second >= 0 && P.first < szer && P.second < wys)
-        return true;
-    else
-        return false;
-}
-
-bool MyWindow::clickedIntoWindow(double range){
-    if(clickedIntoWindow({x0+range, y0+range}) && clickedIntoWindow({x0-range, y0-range})
-            && clickedIntoWindow({x0+range, y0-range}) && clickedIntoWindow({x0-range, y0+range}))
         return true;
     else
         return false;
@@ -347,79 +341,75 @@ bool MyWindow::clickedIntoWindow(double range){
 
 /////draw
 
-void MyWindow::drawLine(std::pair<int,int> p1, std::pair<int,int> p2){
-    if(clickedIntoWindow(p2)){
-        float a, b;
-        if(p1.first == p2.first){
-            for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1))
-                paintPixels(p1.first, y);
+void mainWindow::drawLine(std::pair<int,int> p1, std::pair<int,int> p2){
+    float a, b;
+    if(p1.first == p2.first){
+        for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1))
+            paintPixels(p1.first, y);
+    }
+    else{
+        a = float(p1.second - p2.second)/(p1.first - p2.first);
+        b = p1.second - a * p1.first;
+
+        if(a <= 1 && a >= -1){
+            for(int x = p1.first; x != p2.first; x += (p1.first < p2.first ? 1 : -1)){
+                int y = a*x+b;
+                paintPixels(x, y);
+            }
         }
         else{
-            a = float(p1.second - p2.second)/(p1.first - p2.first);
-            b = p1.second - a * p1.first;
-
-            if(a <= 1 && a >= -1){
-                for(int x = p1.first; x != p2.first; x += (p1.first < p2.first ? 1 : -1)){
-                    int y = a*x+b;
-                    paintPixels(x, y);
-                }
-            }
-            else{
-                for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1)){
-                    int x = (y-b)/a;
-                    paintPixels(x, y);
-                }
+            for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1)){
+                int x = (y-b)/a;
+                paintPixels(x, y);
             }
         }
     }
 }
 
-void MyWindow::drawLine(){
+
+void mainWindow::drawLine(){
     drawLine({x0,y0},{x1,y1});
 }
 
-void MyWindow::drawCircle(){
+void mainWindow::drawCircle(){
     int x, y;
     double r = sqrt(pow(x1-x0, 2.0) + pow(y1-y0, 2.0));
 
-    if(clickedIntoWindow(r)){
-        if(!filling || isPressed){
-            for(x = 0; x < r; x++){
-                y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
-                paintPixels(x0 + x, y0 + y);
-                paintPixels(x0 - x, y0 + y);
-                paintPixels(x0 + x, y0 - y);
-                paintPixels(x0 - x, y0 - y);
-                paintPixels(x0 + y, y0 + x);
-                paintPixels(x0 + y, y0 - x);
-                paintPixels(x0 - y, y0 + x);
-                paintPixels(x0 - y, y0 - x);
-            }
+    if(!filling || isPressed){
+        for(x = 0; x < r; x++){
+            y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
+            paintPixels(x0 + x, y0 + y);
+            paintPixels(x0 - x, y0 + y);
+            paintPixels(x0 + x, y0 - y);
+            paintPixels(x0 - x, y0 - y);
+            paintPixels(x0 + y, y0 + x);
+            paintPixels(x0 + y, y0 - x);
+            paintPixels(x0 - y, y0 + x);
+            paintPixels(x0 - y, y0 - x);
         }
-        else{
-            for(int x = 0; x < r; x++){
-                for(int y = 0; y < r; y++){
-                    if(y*y + x*x <= r*r){
-                        paintPixels(x0 + x, y0 + y);
-                        paintPixels(x0 - x, y0 + y);
-                        paintPixels(x0 + x, y0 - y);
-                        paintPixels(x0 - x, y0 - y);
-                    }
+    }
+    else{
+        for(int x = 0; x < r; x++){
+            for(int y = 0; y < r; y++){
+                if(y*y + x*x <= r*r){
+                    paintPixels(x0 + x, y0 + y);
+                    paintPixels(x0 - x, y0 + y);
+                    paintPixels(x0 + x, y0 - y);
+                    paintPixels(x0 - x, y0 - y);
                 }
             }
         }
     }
 }
 
-void MyWindow::drawPolygon(){
+
+void mainWindow::drawPolygon(){
     std::pair<double, double> copy[2] = {{x0,y0}, {x1,y1}};
     double x, y;
     double alpha = 2 * M_PI/polygonVertices;
     double a, b;
     std::vector<std::pair<double,double>> points;
 
-    if(!clickedIntoWindow())
-        return;
 
     a = double(x1>=x0 ? x1-x0 : x0-x1);
     b = double(y1>=y0 ? y1-y0 : y0-y1);
@@ -427,9 +417,6 @@ void MyWindow::drawPolygon(){
     for(double beta = alpha; beta <= 2*M_PI; beta += 2 * M_PI/polygonVertices){
         y = (b * sin(beta));
         x = (a * cos(beta));
-
-        if(!clickedIntoWindow({x+x0,y+y0}))
-            return;
 
         points.push_back({x0+x, y0+y});
 
@@ -456,7 +443,7 @@ void MyWindow::drawPolygon(){
     y1 = copy[1].second;
 }
 
-void MyWindow::addControlPoint(){
+void mainWindow::addControlPoint(){
     std::vector<std::pair<int,int>> vctr;
     vctr.push_back({x1, y1});
 
@@ -473,7 +460,7 @@ void MyWindow::addControlPoint(){
     }
 }
 
-void MyWindow::drawBezier(std::vector<std::pair<int,int>> curve){
+void mainWindow::drawBezier(std::vector<std::pair<int,int>> curve){
     std::pair<int,int> p0, p1;
     double t;
     //std::cout << curve[0].first << "," << curve[0].second << "," << curve[1].first << "," << curve[1].second << "," <<  curve[2].first << "," << curve[2].second << "," << curve[3].first << "," << curve[3].second << std::lastl;
@@ -498,7 +485,7 @@ void MyWindow::drawBezier(std::vector<std::pair<int,int>> curve){
     }
 }
 
-void MyWindow::bezierInterface(){
+void mainWindow::bezierInterface(){
     bool fillingTmp = filling;
     filling = true;
 
@@ -536,7 +523,7 @@ void MyWindow::bezierInterface(){
     filling = fillingTmp;
 }
 
-void MyWindow::updateBezierInterface(){
+void mainWindow::updateBezierInterface(){
     if(mode == 5 && switcher){
         clickedBefore = false;
         switcher = false;
@@ -545,7 +532,7 @@ void MyWindow::updateBezierInterface(){
     }
 }
 
-void MyWindow::modifyBezier(){
+void mainWindow::modifyBezier(){
     switcher = false;
 
     char colortmp;
@@ -579,7 +566,7 @@ void MyWindow::modifyBezier(){
     }
 }
 
-void MyWindow::deleteBezier(){
+void mainWindow::deleteBezier(){
     switcher = false;
     unsigned long  min, max;
     char colortmp = color;

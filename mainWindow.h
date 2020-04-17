@@ -1,5 +1,5 @@
-#ifndef MYWINDOW_H
-#define MYWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <iostream>
 #include <cmath>
@@ -25,19 +25,19 @@
 #include <QSpinBox>
 
 namespace Ui {
-    class MyWindow;
+    class mainWindow;
 }
 
 
-class MyWindow : public QMainWindow {
+class mainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MyWindow(QWidget *parent = 0);
+    explicit mainWindow(QWidget *parent = 0);
 
-    ~MyWindow();
+    ~mainWindow();
 
 private:
-    Ui::MyWindow *ui;
+    Ui::mainWindow *ui;
     QImage *img;
     QImage imgCopy;
     QImage imgEditor;
@@ -61,7 +61,6 @@ private:
     int x0, y0, x1, y1;
     int polygonVertices;
     std::vector<std::vector<std::pair<int,int>>> control_points;
-    //std::vector<std::pair<int, int>> curve;
 
     //methods
     void czysc();
@@ -71,7 +70,6 @@ private:
     //verifications
     bool clickedIntoWindow(std::pair<int, int>);
     bool clickedIntoWindow();
-    bool clickedIntoWindow(double);
 
     //tools
     void paintPixels(int, int);
@@ -113,4 +111,4 @@ private slots:
     void on_deleteBezier_clicked();
 };
 
-#endif // MYWINDOW_H
+#endif // MAINWINDOW_H
