@@ -1,9 +1,8 @@
 #include <QApplication>
-#include "mainWindow.h"
+#include <mainWindow.h>
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
-
     mainWindow w;
 
     w.show();
@@ -11,5 +10,10 @@ int main(int argc, char *argv[]){
     return a.exec();
 }
 
-//ideas:
-//step back/step forward/filling on|off
+//todo:
+//step back/step forward
+//separacja tools od window :/
+//wlasny point(lib na przyszlosc)
+
+//done:
+//linie pomocnicze, cpy,

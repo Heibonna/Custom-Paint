@@ -13,10 +13,25 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainWindow.cpp
+        interfaces.cpp \
+        mainWindow.cpp \
+        toolBSpline.cpp \
+        toolBezierCurve.cpp \
+        toolCircle.cpp \
+        toolFulfill.cpp \
+        toolLine.cpp \
+        toolPolygon.cpp \
+        tools.cpp
 
 HEADERS  += \
-    mainWindow.h
+    mainWindow.h \
+    toolBSpline.h \
+    toolBezierCurve.h \
+    toolCircle.h \
+    toolFulfill.h \
+    toolLine.h \
+    toolPolygon.h \
+    tools.h
 
 FORMS    += \
     mainWindow.ui

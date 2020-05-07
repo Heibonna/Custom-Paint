@@ -1,5 +1,12 @@
 ﻿#include "mainWindow.h"
 #include "ui_mainWindow.h"
+#include "tools.h"
+#include "toolLine.h"
+#include "toolCircle.h"
+#include "toolPolygon.h"
+#include "toolBezierCurve.h"
+#include "toolBSpline.h"
+#include "toolFulfill.h"
 
 mainWindow::mainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +22,13 @@ mainWindow::mainWindow(QWidget *parent) :
     poczY = ui->Frame->y();
 
     img = new QImage(szer,wys,QImage::Format_RGB32);
+    Line = new toolLine(this);
+    Circle = new toolCircle(this);
+    Polygon = new toolPolygon(this);
+    Bezier = new toolBezierCurve(this);
+    Spline = new toolBSpline(this);
+    Fulfill = new toolFulfill(this);
+    imgCopy = QImage(szer,wys,QImage::Format_RGB32);
 
     isPressed = 0;
     mode = 0;
@@ -23,21 +37,31 @@ mainWindow::mainWindow(QWidget *parent) :
     x1 = -1;
     y1 = -1;
 
-    color = 'w';
+    primaryColor = "white";
     on_cleanButton_clicked();
-    color = 'b';
+    primaryColor = "black";
+
+    secondaryColor = "white";
 
     polygonVertices = 4;
-
-    filling = false;
-    switcher = false;
-    clickedBefore = false;
 }
 
 mainWindow::~mainWindow()
 {
     delete ui;
 }
+
+void mainWindow::cpyImg(QImage* cpy,QImage* src){
+    for(int i=0; i<wys; i++){
+        for(int j=0; j<szer; j++){
+            cpy->bits()[szer*4*i + 4*j] = src->bits()[szer*4*i + 4*j];
+            cpy->bits()[szer*4*i + 4*j + 1] = src->bits()[szer*4*i + 4*j + 1];
+            cpy->bits()[szer*4*i + 4*j + 2] = src->bits()[szer*4*i + 4*j + 2];
+            cpy->bits()[szer*4*i + 4*j + 3] = src->bits()[szer*4*i + 4*j + 3];
+        }
+    }
+}
+
 
 void mainWindow::on_exitButton_clicked()
 {
@@ -50,202 +74,187 @@ void mainWindow::paintEvent(QPaintEvent*)
     p.drawImage(poczX,poczY,*img);
 }
 
+void mainWindow::paintPixels(int x, int y, Color clr){
+    unsigned char *ptr;
+    ptr = img->bits();
+    if(clickedIntoWindow({x,y})){
+        ptr[szer*4*y + 4*x] = clr.blue;
+        ptr[szer*4*y + 4*x + 1] = clr.green;
+        ptr[szer*4*y + 4*x + 2] = clr.red;
+        ptr[szer*4*y + 4*x + 3] = clr.alpha;
+    }
+}
+
+void mainWindow::paintPixels(int x, int y){
+    paintPixels(x, y, primaryColor);
+}
+
 void mainWindow::on_cleanButton_clicked()
 {
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
+
+
     for(int i=0; i<wys; i++){
         for(int j=0; j<szer; j++){
-           paintPixels(j,i);
+           paintPixels(j,i, primaryColor);
         }
     }
-    backgroundColor = color;
-    if(!control_points.empty())
-        control_points.clear();
-    update();
-}
 
-void mainWindow::on_draw1Button_clicked()
-{
-    rysuj1();
-    update();
-}
+    if(!Bezier->control_points.empty())
+        Bezier->control_points.clear();
+    if(!Spline->control_points.empty())
+        Spline->control_points.clear();
 
-void mainWindow::on_draw2Button_clicked()
-{
-    rysuj2();
     update();
 }
 
 void mainWindow::on_penButton_clicked(){
-    updateBezierInterface();
     mode = 0;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
 }
 
 void mainWindow::on_lineButton_clicked(){
-    updateBezierInterface();
     mode = 1;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
 }
 
 void mainWindow::on_redButton_clicked(){
-    color = 'r';
+    primaryColor = "red";
 }
 
 void mainWindow::on_greenButton_clicked(){
-    color = 'g';
+    primaryColor = "green";
 }
 
 void mainWindow::on_blueButton_clicked(){
-    color = 'l';
+    primaryColor = "blue";
 }
 
 void mainWindow::on_blackButton_clicked(){
-    color = 'b';
+    primaryColor = "black";
 }
 
 void mainWindow::on_whiteButton_clicked(){
-    color = 'w';
+    primaryColor = "white";
 }
 
 void mainWindow::on_circleButton_clicked(){
-    updateBezierInterface();
     mode = 2;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
+
 }
 
 void mainWindow::on_polygonButton_clicked(){
-    updateBezierInterface();
     mode = 3;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
+
 }
 
 void mainWindow::on_spinBox_valueChanged(int value){
     polygonVertices = value;
 }
 
-void mainWindow::on_fillingBox_stateChanged(int state){
-    if(state)
-        filling = true;
-    else
-        filling = false;
-}
-
 void  mainWindow::on_addBezier_clicked(){
-    updateBezierInterface();
-
     mode = 4;
+    Bezier -> current_adding = -1;
 
-    if(!control_points.empty() && control_points.back().size() != 4)
-        control_points.back().clear();
+    std::vector<std::pair<int,int>> vctr;
+    Bezier -> control_points.push_back(vctr);
+
+    if(Spline->interface)
+        Spline->Interface(false);
+    if(!Bezier->interface)
+        Bezier->Interface(true);
 }
 
 void  mainWindow::on_modifyBezier_clicked(){
     mode = 5;
 
-    if(!control_points.empty() && control_points.back().size() != 4)
-        control_points.back().clear();
-
-    if(!clickedBefore){
-        switcher = true;
-        bezierInterface();
-        update();
-    }
-    clickedBefore = true;
+    if(Spline->interface)
+        Spline->Interface(false);
+    if(!Bezier->interface)
+        Bezier->Interface(true);
 }
 
 void  mainWindow::on_deleteBezier_clicked(){
     mode = 6;
 
-    if(!control_points.empty() && control_points.back().size() != 4)
-        control_points.back().clear();
+    if(Spline->interface)
+        Spline->Interface(false);
+    if(!Bezier->interface)
+        Bezier->Interface(true);
+}
 
-    if(!clickedBefore){
-        switcher = true;
-        bezierInterface();
-        update();
-    }
-    clickedBefore = true;
+void  mainWindow::on_addSpline_clicked(){
+    mode = 7;
+    Spline -> current_adding = -1;
+
+    std::vector<std::pair<int,int>> vctr;
+    Spline -> control_points.push_back(vctr);
+
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(!Spline->interface)
+        Spline->Interface(true);
+}
+
+void  mainWindow::on_modifySpline_clicked(){
+    mode = 8;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(!Spline->interface)
+        Spline->Interface(true);
+}
+
+void  mainWindow::on_deleteSpline_clicked(){
+    mode = 9;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(!Spline->interface)
+        Spline->Interface(true);
+}
+
+void  mainWindow::on_floodFill_clicked(){
+    mode = 10;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
+}
+
+void  mainWindow::on_scanLine_clicked(){
+    mode = 11;
+
+    if(Bezier->interface)
+        Bezier->Interface(false);
+    if(Spline->interface)
+        Spline->Interface(false);
 }
 
 
-////////////////////////////////////////////////////
-
-
-void mainWindow::paintPixels(int x, int y){
-    unsigned char *ptr;
-    ptr = img->bits();
-
-    if(clickedIntoWindow({x,y})){
-        if(color == 'b'){
-            ptr[szer*4*y + 4*x] = 0;
-            ptr[szer*4*y + 4*x + 1] = 0;
-            ptr[szer*4*y + 4*x + 2] = 0;
-            ptr[szer*4*y + 4*x + 3] = 255;
-        }
-        else if(color == 'w'){
-            ptr[szer*4*y + 4*x] = 255;
-            ptr[szer*4*y + 4*x + 1] = 255;
-            ptr[szer*4*y + 4*x + 2] = 255;
-            ptr[szer*4*y + 4*x + 3] = 255;
-        }
-        else if(color == 'l'){
-            ptr[szer*4*y + 4*x] = 255;
-            ptr[szer*4*y + 4*x + 1] = 0;
-            ptr[szer*4*y + 4*x + 2] = 0;
-            ptr[szer*4*y + 4*x + 3] = 255;
-        }
-        else if(color == 'r'){
-            ptr[szer*4*y + 4*x] = 0;
-            ptr[szer*4*y + 4*x + 1] = 0;
-            ptr[szer*4*y + 4*x + 2] = 255;
-            ptr[szer*4*y + 4*x + 3] = 255;
-        }
-        else if(color == 'g'){
-            ptr[szer*4*y + 4*x] = 0;
-            ptr[szer*4*y + 4*x + 1] = 255;
-            ptr[szer*4*y + 4*x + 2] = 0;
-            ptr[szer*4*y + 4*x + 3] = 255;
-        }
-        else{
-            std::cout << "Error: wrong color\n";
-        }
-    }
-}
-
-void mainWindow::rysuj1()
-{
-        unsigned char *ptr;
-        ptr = img->bits();
-        int szer = img->width();
-        int wys = img->height();
-
-        int i,j;
-
-        for(i=0;i<wys;i++)
-        {
-                for(j=0;j<szer ;j++)
-                {
-                        ptr[szer*4*i + 4*j]=i;
-                        ptr[szer*4*i + 4*j + 1] = j;
-                        ptr[szer*4*i + 4*j + 2] = i*j;
-                }
-        }
-}
-
-void mainWindow::rysuj2()
-{
-        unsigned char *ptr;
-        ptr = img->bits();
-        int szer = img->width();
-        int wys = img->height();
-
-        int i,j;
-        for(i=0;i<wys;i++)
-        {
-                for(j=0;j<szer ;j++)
-                {
-                        ptr[szer*4*i + 4*j]=i;
-                        ptr[szer*4*i + 4*j + 1] = j;
-                        ptr[szer*4*i + 4*j + 2] = i+j;
-                }
-        }
-}
 
 /////mouse tracking
 
@@ -255,13 +264,21 @@ void mainWindow::mousePressEvent(QMouseEvent *event){
     x0 = event->x() - poczX;
     y0 = event->y() - poczY;
 
-    imgCopy = *img;
+    if(mode == 5){
+        Bezier->copy_x0 = x0;
+        Bezier->copy_y0 = y0;
+    }
+    if(mode == 8){
+        Spline->copy_x0 = x0;
+        Spline->copy_y0 = y0;
+    }
+
+    cpyImg(&imgCopy,img);
 }
 
 void mainWindow::mouseMoveEvent(QMouseEvent *event){
     x1 = event->x() - poczX;
     y1 = event->y() - poczY;
-    //std::cout << x1 << "," << y1 << std::endl;
 
     if(mode == 0){
         if(isPressed){
@@ -272,20 +289,32 @@ void mainWindow::mouseMoveEvent(QMouseEvent *event){
     }
     else if(mode == 1){
         if(isPressed){
-            *img = imgCopy;
-            drawLine();
+            cpyImg(img, &imgCopy);
+            Line->draw();
         }
     }
     else if(mode == 2){
         if(isPressed){
-            *img = imgCopy;
-            drawCircle();
+            cpyImg(img, &imgCopy);
+            Circle->draw();
         }
     }
     else if(mode == 3){
         if(isPressed){
-            *img = imgCopy;
-            drawPolygon();
+            cpyImg(img, &imgCopy);
+            Polygon->draw();
+        }
+    }
+    else if(mode == 5 && clickedIntoWindow()){
+        if(isPressed){
+            cpyImg(img, &imgCopy);
+            Bezier->modifyBezier();
+        }
+    }
+    else if(mode == 8 && clickedIntoWindow()){
+        if(isPressed){
+            cpyImg(img, &imgCopy);
+            Spline->modify();
         }
     }
     update();
@@ -297,23 +326,41 @@ void mainWindow::mouseReleaseEvent(QMouseEvent *event){
     isPressed = false;
 
     if(mode == 1)
-        drawLine();
+        Line -> draw();
     else if(mode == 2)
-        drawCircle();
+        Circle -> draw();
     else if(mode == 3)
-        drawPolygon();
-    else if(mode == 4)
-        addControlPoint();
-    else if(mode == 5 && clickedIntoWindow() && !control_points.empty()){
-        *img = imgEditor;
-        modifyBezier();
-        clickedBefore = false;
+        Polygon -> draw();
+    else if(mode == 4){
+        Bezier->Interface(false);
+        Bezier -> addControlPoint();
+        Bezier->Interface(true);
     }
-    else if(mode == 6 && clickedIntoWindow() && !control_points.empty()){
-        *img = imgEditor;
-        deleteBezier();
-        clickedBefore = false;
+    else if(mode == 5 && clickedIntoWindow() && !Bezier -> control_points.empty()){
+        Bezier -> modifyBezier();
     }
+    else if(mode == 6 && clickedIntoWindow() && !Bezier -> control_points.empty()){
+        Bezier->Interface(false);
+        Bezier -> deleteBezier();
+        Bezier->Interface(true);
+    }
+    else if(mode == 7){
+        Spline->Interface(false);
+        Spline->addControlPoint();
+        Spline->Interface(true);
+    }
+    else if(mode == 8 && clickedIntoWindow() && !Spline -> control_points.empty()){
+        Spline -> modify();
+    }
+    else if(mode == 9 && clickedIntoWindow() && !Spline -> control_points.empty()){
+        Spline->Interface(false);
+        Spline->del();
+        Spline->Interface(true);
+    }
+    else if(mode == 10 && clickedIntoWindow())
+        Fulfill->draw(x1, y1, mode, img->bits());
+    else if(mode == 11 && clickedIntoWindow())
+        Fulfill->draw(x1, y1, mode, img->bits());
 
     x0 = -1;
     y0 = -1;
@@ -323,15 +370,6 @@ void mainWindow::mouseReleaseEvent(QMouseEvent *event){
     update();
 }
 
-/////exceptions
-
-bool mainWindow::clickedIntoWindow(){
-    if(clickedIntoWindow({x0, y0}) && clickedIntoWindow({x1, y1}))
-        return true;
-    else
-        return false;
-}
-
 bool mainWindow::clickedIntoWindow(std::pair<int, int> P){
     if(P.first >= 0 && P.second >= 0 && P.first < szer && P.second < wys)
         return true;
@@ -339,299 +377,9 @@ bool mainWindow::clickedIntoWindow(std::pair<int, int> P){
         return false;
 }
 
-/////draw
-
-void mainWindow::drawLine(std::pair<int,int> p1, std::pair<int,int> p2){
-    float a, b;
-    if(p1.first == p2.first){
-        for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1))
-            paintPixels(p1.first, y);
-    }
-    else{
-        a = float(p1.second - p2.second)/(p1.first - p2.first);
-        b = p1.second - a * p1.first;
-
-        if(a <= 1 && a >= -1){
-            for(int x = p1.first; x != p2.first; x += (p1.first < p2.first ? 1 : -1)){
-                int y = a*x+b;
-                paintPixels(x, y);
-            }
-        }
-        else{
-            for(int y = p1.second; y != p2.second; y += (p1.second < p2.second ? 1 : -1)){
-                int x = (y-b)/a;
-                paintPixels(x, y);
-            }
-        }
-    }
+bool mainWindow::clickedIntoWindow(){
+    if(clickedIntoWindow({x0, y0}) && clickedIntoWindow({x1, y1}))
+        return true;
+    else
+        return false;
 }
-
-
-void mainWindow::drawLine(){
-    drawLine({x0,y0},{x1,y1});
-}
-
-void mainWindow::drawCircle(){
-    int x, y;
-    double r = sqrt(pow(x1-x0, 2.0) + pow(y1-y0, 2.0));
-
-    if(!filling || isPressed){
-        for(x = 0; x < r; x++){
-            y = int(sqrt(pow(r, 2.0) - pow(x, 2.0)));
-            paintPixels(x0 + x, y0 + y);
-            paintPixels(x0 - x, y0 + y);
-            paintPixels(x0 + x, y0 - y);
-            paintPixels(x0 - x, y0 - y);
-            paintPixels(x0 + y, y0 + x);
-            paintPixels(x0 + y, y0 - x);
-            paintPixels(x0 - y, y0 + x);
-            paintPixels(x0 - y, y0 - x);
-        }
-    }
-    else{
-        for(int x = 0; x < r; x++){
-            for(int y = 0; y < r; y++){
-                if(y*y + x*x <= r*r){
-                    paintPixels(x0 + x, y0 + y);
-                    paintPixels(x0 - x, y0 + y);
-                    paintPixels(x0 + x, y0 - y);
-                    paintPixels(x0 - x, y0 - y);
-                }
-            }
-        }
-    }
-}
-
-
-void mainWindow::drawPolygon(){
-    std::pair<double, double> copy[2] = {{x0,y0}, {x1,y1}};
-    double x, y;
-    double alpha = 2 * M_PI/polygonVertices;
-    double a, b;
-    std::vector<std::pair<double,double>> points;
-
-
-    a = double(x1>=x0 ? x1-x0 : x0-x1);
-    b = double(y1>=y0 ? y1-y0 : y0-y1);
-
-    for(double beta = alpha; beta <= 2*M_PI; beta += 2 * M_PI/polygonVertices){
-        y = (b * sin(beta));
-        x = (a * cos(beta));
-
-        points.push_back({x0+x, y0+y});
-
-    }
-    for(int i = 0; i < polygonVertices-1; i++){
-        x0 = points[i].first;
-        y0 = points[i].second;
-        x1 = points[i+1].first;
-        y1 = points[i+1].second;
-
-        drawLine();
-    }
-    x0 = points[polygonVertices-1].first;
-    y0 = points[polygonVertices-1].second;
-    x1 = points[0].first;
-    y1 = points[0].second;
-    drawLine();
-
-    //std::cout << "x0,x1,y0,y1,alhpa,a,b(" << x0 << "," << x1 << "," << y0 << "," << y1 << "," << alpha << "," << a << "," << b << ")"<< std::endl;
-
-    x0 = copy[0].first;
-    y0 = copy[0].second;
-    x1 = copy[1].first;
-    y1 = copy[1].second;
-}
-
-void mainWindow::addControlPoint(){
-    std::vector<std::pair<int,int>> vctr;
-    vctr.push_back({x1, y1});
-
-    if(control_points.empty()){
-        control_points.push_back(vctr);
-    }
-    else{
-        control_points.back().push_back({x1, y1});
-
-        if(control_points.back().size() == 4){
-            drawBezier(control_points.back());
-            control_points.push_back(vctr);
-        }
-    }
-}
-
-void mainWindow::drawBezier(std::vector<std::pair<int,int>> curve){
-    std::pair<int,int> p0, p1;
-    double t;
-    //std::cout << curve[0].first << "," << curve[0].second << "," << curve[1].first << "," << curve[1].second << "," <<  curve[2].first << "," << curve[2].second << "," << curve[3].first << "," << curve[3].second << std::lastl;
-
-    p0 = {0, 0};
-    p1 = {0, 0};
-
-    for(int i = 0;i <= 60; i++){
-        t = i/60.0;
-
-        if(p0.first != 0 && p0.second != 0){
-            p1.swap(p0);
-            p0.first = round(pow(1.0-t,3.0)*curve[0].first + 3*pow(1.0-t,2.0)*curve[1].first*t + 3*(1.0-t)*curve[2].first*t*t + curve[3].first*t*t*t);
-            p0.second = round(pow(1.0-t,3.0)*curve[0].second + 3*pow(1.0-t,2.0)*curve[1].second*t + 3*(1.0-t)*curve[2].second*t*t + curve[3].second*t*t*t);
-            drawLine(p0, p1);
-        }
-        else{
-            p0.first = round(pow(1.0-t,3.0)*curve[0].first + 3*pow(1.0-t,2.0)*curve[1].first*t + 3*(1.0-t)*curve[2].first*t*t + curve[3].first*t*t*t);
-            p0.second = round(pow(1.0-t,3.0)*curve[0].second + 3*pow(1.0-t,2.0)*curve[1].second*t + 3*(1.0-t)*curve[2].second*t*t + curve[3].second*t*t*t);
-        }
-        //std::cout << "p0,p1,t(" << p0.first << "," << p0.second << "," << p1.first << "," << p1.second << "," << t << ")"<< std::endl;
-    }
-}
-
-void mainWindow::bezierInterface(){
-    bool fillingTmp = filling;
-    filling = true;
-
-    if(switcher && !control_points.empty()){
-        imgEditor = *img;
-        char clr = color;
-
-        for(unsigned long i = 0; i < control_points.size(); i++){
-            for(unsigned long j = 0; j < control_points[i].size(); j++){
-                if(backgroundColor != 'r')
-                    color = 'r';
-                else
-                    color = 'g';
-
-                x0 = control_points[i][j].first;
-                y0 = control_points[i][j].second;
-                x1 = control_points[i][j].first+4;
-                y1 = control_points[i][j].second+4;
-                drawCircle();
-
-                color = clr;
-                x0 = control_points[i][j].first;
-                y0 = control_points[i][j].second;
-                x1 = control_points[i][j].first+2;
-                y1 = control_points[i][j].second+2;
-                drawCircle();
-            }
-        }
-        color = clr;
-    }
-    else if(!switcher){
-        *img = imgEditor;
-    }
-
-    filling = fillingTmp;
-}
-
-void mainWindow::updateBezierInterface(){
-    if(mode == 5 && switcher){
-        clickedBefore = false;
-        switcher = false;
-        bezierInterface();
-        update();
-    }
-}
-
-void mainWindow::modifyBezier(){
-    switcher = false;
-
-    char colortmp;
-
-    for(unsigned long  i=0; i < control_points.size()-1; i++){
-        for(unsigned long  j=0; j < control_points[i].size(); j++){
-            if(abs(control_points[i][j].first - x0) <= 5 && abs(control_points[i][j].second - y0) <= 5){
-            colortmp = color;
-            if(j == 3 && control_points.size() - 2 != i){
-                if(control_points[i][3] == control_points[i+1][0] && control_points[i+1].size() != 0){
-                    color = backgroundColor;
-                    drawBezier(control_points[i+1]);
-                    color = colortmp;
-
-                    control_points[i+1][0].first = x1;
-                    control_points[i+1][0].second = y1;
-                    drawBezier(control_points[i+1]);
-                }
-            }
-            color = backgroundColor;
-            drawBezier(control_points[i]);
-            color = colortmp;
-
-            control_points[i][j].first = x1;
-            control_points[i][j].second = y1;
-            drawBezier(control_points[i]);
-
-            return;
-            }
-        }
-    }
-}
-
-void mainWindow::deleteBezier(){
-    switcher = false;
-    unsigned long  min, max;
-    char colortmp = color;
-    for(unsigned long  i=0; i < control_points.size()-1; i++){
-        if(control_points[i].size() == 0)
-            continue;
-        for(unsigned long  j=0; j < control_points[i].size(); j++){
-            if(abs(control_points[i][j].first - x0) <= 5 && abs(control_points[i][j].second - y0) <= 5){
-                max = i-1;
-                do{
-                    max++;
-                    color = backgroundColor;
-                    drawBezier(control_points[max]);
-                    color = colortmp;
-                    if(control_points.size() == max+2 ||control_points[max+1].size() == 0)
-                        break;
-                }
-                while(control_points[max][3] == control_points[max+1][0]);
-                min = i;
-
-                if(j == 0 && control_points.size() != 1 && control_points[i][0] == control_points[i-1][3]){
-
-                    min--;
-                    color = backgroundColor;
-                    drawBezier(control_points[min]);
-                    color = colortmp;
-
-                    control_points[i-1][3] = control_points[i][1];
-                }
-                if(j == 3 && control_points.size() > i+2 && control_points[i+1].size() != 0){
-                    control_points[i][3] = control_points[i+1][1];
-                    control_points[i+1][0] = control_points[i+1][1];
-
-                    for(unsigned long  k=i+1; k < max; k++){
-                        for(unsigned long  l=1; l < control_points[k].size(); l++){
-                            if(l != 3)
-                                control_points[k][l] = control_points[k][l+1];
-                            else
-                                control_points[k][l] = control_points[k+1][0];
-
-                        }
-                    }
-                }
-                else{
-                    for(unsigned long  k=i; k <= max; k++){
-                        for(unsigned long  l=0; l < control_points[k].size(); l++){
-                            if(i == k && l < j)
-                                continue;
-                            else{
-                                if(l != 3)
-                                    control_points[k][l] = control_points[k][l+1];
-                                else if(control_points[k].size() == l+1 && k == max)
-                                    control_points[k].clear();
-                                else
-                                    control_points[k][l] = control_points[k+1][1];
-                            }
-                        }
-                    }
-                }
-                for(unsigned long  k=min; k <= max; k++)
-                    if(control_points[k].size() == 4)
-                        drawBezier(control_points[k]);
-                return;
-            }
-        }
-    }
-}
-
