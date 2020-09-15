@@ -1,4 +1,4 @@
 # Custom-paint
 Simple graphics painting program created with QT framework. 
-Includes: pen-tool, filling-tool, line-tool, circle-tool (also filled), polygon-tool, Bézier curve-tools and 2 examples of gradient.
-Only low-level methods were used in the project.
+Includes: 2D drawing and transformations tools, examples of layer blending and a few diffrent tools that you can use to edit image. 
+Only low-level QT methods were used in the project.
