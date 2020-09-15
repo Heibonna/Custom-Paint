@@ -10,13 +10,10 @@ private:
 public:
     toolFulfill(mainWindow *w);
 
-    void draw() override;
-    void draw(int x,int y,int mode, unsigned char* bits);
-    void Interface(bool active) override;
+    void draw(Point P1, unsigned char* bits);
 
     Color getColor(int x, int y);
     void floodFill(int x, int y);
-    void scanLine(int x, int y);
 };
 
 #endif // TOOLFULFILL_H

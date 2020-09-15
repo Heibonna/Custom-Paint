@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>resources/aurora.jpg</file>
+    <file>resources/linux.png</file>
+    <file>resources/mlp.jpg</file>
+    <file>resources/virus-icon.jpg</file>
+    <file>resources/linux2.png</file>
+</qresource>
+</RCC>

@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
-    <height>805</height>
+    <width>1050</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1020</width>
-    <height>805</height>
+    <width>1050</width>
+    <height>800</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1020</width>
-    <height>805</height>
+    <width>1050</width>
+    <height>800</height>
    </size>
   </property>
   <property name="mouseTracking">
@@ -34,8 +34,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>881</width>
-      <height>711</height>
+      <width>768</width>
+      <height>768</height>
      </rect>
     </property>
     <property name="mouseTracking">
@@ -51,24 +51,24 @@
    <widget class="QGroupBox" name="Tools">
     <property name="geometry">
      <rect>
-      <x>897</x>
+      <x>790</x>
       <y>10</y>
-      <width>111</width>
-      <height>181</height>
+      <width>251</width>
+      <height>151</height>
      </rect>
     </property>
     <property name="mouseTracking">
      <bool>false</bool>
     </property>
     <property name="title">
-     <string>Tools</string>
+     <string>  Tools</string>
     </property>
     <widget class="QPushButton" name="cleanButton">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>93</width>
+       <x>140</x>
+       <y>120</y>
+       <width>91</width>
        <height>23</height>
       </rect>
      </property>
@@ -76,15 +76,15 @@
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>Clear</string>
+      <string>Clear All</string>
      </property>
     </widget>
     <widget class="QPushButton" name="penButton">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>93</width>
+       <x>60</x>
+       <y>30</y>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -99,8 +99,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
-       <width>93</width>
+       <y>60</y>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -114,9 +114,9 @@
     <widget class="QPushButton" name="circleButton">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>120</y>
-       <width>93</width>
+       <x>60</x>
+       <y>60</y>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -127,8 +127,8 @@
     <widget class="QSpinBox" name="spinBox">
      <property name="geometry">
       <rect>
-       <x>65</x>
-       <y>150</y>
+       <x>75</x>
+       <y>90</y>
        <width>38</width>
        <height>23</height>
       </rect>
@@ -144,8 +144,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>150</y>
-       <width>55</width>
+       <y>90</y>
+       <width>65</width>
        <height>23</height>
       </rect>
      </property>
@@ -153,265 +153,1037 @@
       <string>Polygon</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="floodFillButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>51</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="acceptDrops">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Fill</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="scanLineButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="acceptDrops">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Filled Polygon</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="Bezier">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>0</y>
+       <width>61</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>  Bézier</string>
+     </property>
+     <widget class="QPushButton" name="addBezier">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="modifyBezier">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>60</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Modify</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="deleteBezier">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>90</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Delete</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="Bspline">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>0</y>
+       <width>61</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>  B-spline</string>
+     </property>
+     <widget class="QPushButton" name="addSpline">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>30</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="modifySpline">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>60</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Modify</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="deleteSpline">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>90</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Delete</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="exitButton">
+   <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>750</y>
-      <width>75</width>
-      <height>23</height>
+      <x>790</x>
+      <y>370</y>
+      <width>251</width>
+      <height>181</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Wyjście</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
+    <widget class="QWidget" name="tabWidgetPage1">
+     <attribute name="title">
+      <string>α-blending</string>
+     </attribute>
+     <widget class="QSlider" name="alphaValue">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="blendingMode">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>231</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>normal</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>multiply</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>darken</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>lighten</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>diffrence</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>additive</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>substractive</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QListWidget" name="listWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>231</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="viewMode">
+       <enum>QListView::ListMode</enum>
+      </property>
+      <property name="selectionRectVisible">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>aurora</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>linux</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mlp</string>
+       </property>
+      </item>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="colorPresentation">
+     <attribute name="title">
+      <string>color presentation</string>
+     </attribute>
+     <widget class="QSlider" name="slider6">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>120</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>360</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>100</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>S</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>H</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider5">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>100</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>360</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>V</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider1">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>10</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider4">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>80</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>360</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider3">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>50</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>21</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="slider2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="accessibleDescription">
+       <string/>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
    </widget>
-   <widget class="QGroupBox" name="Bezier">
+   <widget class="QTabWidget" name="tabWidget_2">
     <property name="geometry">
      <rect>
-      <x>897</x>
-      <y>200</y>
-      <width>111</width>
+      <x>790</x>
+      <y>680</y>
+      <width>251</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Primary color</string>
+     </attribute>
+     <widget class="QRadioButton" name="blueButton">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Blue</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="blackButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Black</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="redButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Red</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="whiteButton">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>30</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>White</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="greenButton">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Green</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Secondary color</string>
+     </attribute>
+     <widget class="QRadioButton" name="greenBackgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Green</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="blackBackgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Black</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="whiteBackgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>30</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>White</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="blueBackgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Blue</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="redBackgroundButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>75</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Red</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>550</y>
+      <width>251</width>
       <height>121</height>
      </rect>
     </property>
     <property name="title">
-     <string>Bézier curve</string>
+     <string>   Morphological image processing</string>
     </property>
-    <widget class="QPushButton" name="addBezier">
+    <widget class="QRadioButton" name="crossBox">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>30</y>
-       <width>93</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
      <property name="text">
-      <string>Add</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="modifyBezier">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>93</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Modify</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="deleteBezier">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>93</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Delete</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="Bspline">
-    <property name="geometry">
-     <rect>
-      <x>897</x>
-      <y>330</y>
-      <width>111</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>B-spline</string>
-    </property>
-    <widget class="QPushButton" name="addSpline">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>93</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Add</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="modifySpline">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>93</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Modify</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="deleteSpline">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>93</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Delete</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="Color">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>720</y>
-      <width>351</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Color</string>
-    </property>
-    <widget class="QRadioButton" name="blackButton">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>75</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Black</string>
+      <string>cross</string>
      </property>
      <property name="checked">
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QRadioButton" name="whiteButton">
+    <widget class="QRadioButton" name="cubeBox">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>100</x>
        <y>30</y>
-       <width>75</width>
-       <height>25</height>
+       <width>61</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>White</string>
+      <string>3x3</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="redButton">
+    <widget class="QPushButton" name="erosionButton">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>30</y>
-       <width>75</width>
+       <x>20</x>
+       <y>60</y>
+       <width>89</width>
        <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>Red</string>
+      <string>Erosion</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="greenButton">
+    <widget class="QPushButton" name="dilationButton">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>30</y>
-       <width>75</width>
+       <x>20</x>
+       <y>90</y>
+       <width>89</width>
        <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>Green</string>
+      <string>Dilation</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="blueButton">
+    <widget class="QPushButton" name="openingButton">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>30</y>
-       <width>75</width>
+       <x>140</x>
+       <y>60</y>
+       <width>89</width>
        <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>Blue</string>
+      <string>Opening</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="closingButton">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>90</y>
+       <width>89</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Closing</string>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="fulfillment">
+   <widget class="QGroupBox" name="transformations">
     <property name="geometry">
      <rect>
-      <x>900</x>
-      <y>460</y>
-      <width>111</width>
-      <height>91</height>
+      <x>790</x>
+      <y>170</y>
+      <width>251</width>
+      <height>201</height>
      </rect>
     </property>
     <property name="title">
-     <string>Fulfillment</string>
+     <string>   Transformations</string>
     </property>
-    <widget class="QPushButton" name="floodFill">
+    <widget class="QSlider" name="translationSlider">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>30</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>-250</number>
+     </property>
+     <property name="maximum">
+      <number>250</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="translationSlider2">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>50</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>-250</number>
+     </property>
+     <property name="maximum">
+      <number>250</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="rotationSlider">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>80</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>-360</number>
+     </property>
+     <property name="maximum">
+      <number>360</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="scalingSlider">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>110</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>10</number>
+     </property>
+     <property name="maximum">
+      <number>1500</number>
+     </property>
+     <property name="value">
+      <number>500</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="scalingSlider2">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>130</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>10</number>
+     </property>
+     <property name="maximum">
+      <number>1500</number>
+     </property>
+     <property name="value">
+      <number>500</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedControls">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QSlider" name="shearingSlider">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>160</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>-50</number>
+     </property>
+     <property name="maximum">
+      <number>50</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="shearingSlider2">
+     <property name="geometry">
+      <rect>
+       <x>89</x>
+       <y>180</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>-50</number>
+     </property>
+     <property name="maximum">
+      <number>50</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetButton">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>0</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>93</width>
-       <height>23</height>
+       <width>81</width>
+       <height>17</height>
       </rect>
      </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
-     </property>
      <property name="text">
-      <string>Flood Fill</string>
+      <string>Translation</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="scanLine">
+    <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>93</width>
-       <height>23</height>
+       <y>110</y>
+       <width>67</width>
+       <height>17</height>
       </rect>
      </property>
-     <property name="acceptDrops">
-      <bool>true</bool>
+     <property name="text">
+      <string>Scaling</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>67</width>
+       <height>17</height>
+      </rect>
      </property>
      <property name="text">
-      <string>Scan-Line</string>
+      <string>Rotation</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>71</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Shearing</string>
      </property>
     </widget>
    </widget>
@@ -421,7 +1193,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1020</width>
+     <width>1050</width>
      <height>22</height>
     </rect>
    </property>

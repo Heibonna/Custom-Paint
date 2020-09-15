@@ -7,6 +7,10 @@
 #include "toolBezierCurve.h"
 #include "toolBSpline.h"
 #include "toolFulfill.h"
+#include "toolFulfilledPolygon.h"
+#include "colorPresentation.h"
+#include "layer.h"
+#include "transformations.h"
 
 mainWindow::mainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,22 +32,28 @@ mainWindow::mainWindow(QWidget *parent) :
     Bezier = new toolBezierCurve(this);
     Spline = new toolBSpline(this);
     Fulfill = new toolFulfill(this);
+    FullPolygon = new toolFulfilledPolygon(this);
+    ColorPresentation = new colorPresentation(this, wys, szer);
     imgCopy = QImage(szer,wys,QImage::Format_RGB32);
+    layers = new layer[layerNumber];
+    transform = new transformations(":/resources/virus-icon.jpg", img);
+
+    layers[0] = layer(":/resources/aurora.jpg");
+    layers[1] = layer(":/resources/linux.png");
+    layers[2] = layer(":/resources/mlp.jpg");
 
     isPressed = 0;
     mode = 0;
-    x0 = -1;
-    y0 = -1;
-    x1 = -1;
-    y1 = -1;
-
-    primaryColor = "white";
-    on_cleanButton_clicked();
-    primaryColor = "black";
+    P0 = {-1,-1};
+    P1 = {-1,-1};
 
     secondaryColor = "white";
 
+    cleanWindow();
+
     polygonVertices = 4;
+
+    kernelType = cross;
 }
 
 mainWindow::~mainWindow()
@@ -52,20 +62,17 @@ mainWindow::~mainWindow()
 }
 
 void mainWindow::cpyImg(QImage* cpy,QImage* src){
-    for(int i=0; i<wys; i++){
-        for(int j=0; j<szer; j++){
+    if(cpy->width() != src->width()
+    || cpy->height() != src->width())
+        std::cout << "Cannot copy image" << std::endl;
+    else
+        for(int i=0; i<wys; i++)
+        for(int j=0; j<szer;j++){
             cpy->bits()[szer*4*i + 4*j] = src->bits()[szer*4*i + 4*j];
             cpy->bits()[szer*4*i + 4*j + 1] = src->bits()[szer*4*i + 4*j + 1];
             cpy->bits()[szer*4*i + 4*j + 2] = src->bits()[szer*4*i + 4*j + 2];
             cpy->bits()[szer*4*i + 4*j + 3] = src->bits()[szer*4*i + 4*j + 3];
         }
-    }
-}
-
-
-void mainWindow::on_exitButton_clicked()
-{
-    qApp->quit();
 }
 
 void mainWindow::paintEvent(QPaintEvent*)
@@ -89,17 +96,55 @@ void mainWindow::paintPixels(int x, int y){
     paintPixels(x, y, primaryColor);
 }
 
-void mainWindow::on_cleanButton_clicked()
-{
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
+void mainWindow::updateInterfaces(bool bezier, bool bspline){
+    if(!bezier && bspline){
+        if(Bezier->interface)
+            Bezier->Interface(false);
+        if(!Spline->interface)
+            Spline->Interface(true);
+    }
+    else if(bezier && !bspline){
+        if(Spline->interface)
+            Spline->Interface(false);
+        if(!Bezier->interface)
+            Bezier->Interface(true);
+    }
+    else if(!bezier && !bspline){
+        if(Bezier->interface)
+            Bezier->Interface(false);
+        if(Spline->interface)
+            Spline->Interface(false);
+    }
+}
 
+void mainWindow::updateInterfaces(){
+    updateInterfaces(false, false);
+}
 
+void mainWindow::bezierInterface(){
+    updateInterfaces(true, false);
+}
+
+void mainWindow::splineInterface(){
+    updateInterfaces(false, true);
+}
+
+void mainWindow::setMode(int mode){
+    this->mode = mode;
+    FullPolygon -> points.clear();
+
+    if(mode < 4 || mode > 9)
+        updateInterfaces();
+    else if(mode >= 4 && mode <= 6)
+        bezierInterface();
+    else if(mode >= 7 && mode <= 9)
+        splineInterface();
+}
+
+void mainWindow::cleanWindow(){
     for(int i=0; i<wys; i++){
         for(int j=0; j<szer; j++){
-           paintPixels(j,i, primaryColor);
+            paintPixels(j,i, secondaryColor);
         }
     }
 
@@ -107,66 +152,77 @@ void mainWindow::on_cleanButton_clicked()
         Bezier->control_points.clear();
     if(!Spline->control_points.empty())
         Spline->control_points.clear();
+    FullPolygon -> points.clear();
+
 
     update();
 }
 
-void mainWindow::on_penButton_clicked(){
-    mode = 0;
 
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
+void mainWindow::on_cleanButton_clicked()
+{
+    updateInterfaces();
+    cleanWindow();
+}
+
+void mainWindow::on_penButton_clicked(){
+    setMode(0);
 }
 
 void mainWindow::on_lineButton_clicked(){
-    mode = 1;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
+    setMode(1);
 }
 
 void mainWindow::on_redButton_clicked(){
-    primaryColor = "red";
+    primaryColor = Color(255, 0, 0);
+
 }
 
 void mainWindow::on_greenButton_clicked(){
-    primaryColor = "green";
+    primaryColor = Color(0, 255, 0);
+
 }
 
 void mainWindow::on_blueButton_clicked(){
-    primaryColor = "blue";
+    primaryColor = Color(0, 0, 255);
 }
 
 void mainWindow::on_blackButton_clicked(){
-    primaryColor = "black";
+    primaryColor = Color(0, 0, 0);
 }
 
 void mainWindow::on_whiteButton_clicked(){
-    primaryColor = "white";
+    primaryColor = Color(255, 255, 255);
+}
+
+void mainWindow::on_redBackgroundButton_clicked(){
+    secondaryColor = Color(255, 0, 0);
+
+}
+
+void mainWindow::on_greenBackgroundButton_clicked(){
+    secondaryColor = Color(0, 255, 0);
+
+}
+
+void mainWindow::on_blueBackgroundButton_clicked(){
+    secondaryColor = Color(0, 0, 255);
+}
+
+void mainWindow::on_blackBackgroundButton_clicked(){
+    secondaryColor = Color(0, 0, 0);
+}
+
+void mainWindow::on_whiteBackgroundButton_clicked(){
+    secondaryColor = Color(255, 255, 255);
 }
 
 void mainWindow::on_circleButton_clicked(){
-    mode = 2;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
-
+    setMode(2);
 }
 
 void mainWindow::on_polygonButton_clicked(){
-    mode = 3;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
-
+    setMode(3);
 }
 
 void mainWindow::on_spinBox_valueChanged(int value){
@@ -174,86 +230,187 @@ void mainWindow::on_spinBox_valueChanged(int value){
 }
 
 void  mainWindow::on_addBezier_clicked(){
-    mode = 4;
+    setMode(4);
+
     Bezier -> current_adding = -1;
-
-    std::vector<std::pair<int,int>> vctr;
+    std::vector<Point> vctr;
     Bezier -> control_points.push_back(vctr);
-
-    if(Spline->interface)
-        Spline->Interface(false);
-    if(!Bezier->interface)
-        Bezier->Interface(true);
 }
 
 void  mainWindow::on_modifyBezier_clicked(){
-    mode = 5;
-
-    if(Spline->interface)
-        Spline->Interface(false);
-    if(!Bezier->interface)
-        Bezier->Interface(true);
+    setMode(5);
 }
 
 void  mainWindow::on_deleteBezier_clicked(){
-    mode = 6;
-
-    if(Spline->interface)
-        Spline->Interface(false);
-    if(!Bezier->interface)
-        Bezier->Interface(true);
+    setMode(6);
 }
 
 void  mainWindow::on_addSpline_clicked(){
-    mode = 7;
-    Spline -> current_adding = -1;
+    setMode(7);
 
-    std::vector<std::pair<int,int>> vctr;
+    Spline -> current_adding = -1;
+    std::vector<Point> vctr;
     Spline -> control_points.push_back(vctr);
 
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(!Spline->interface)
-        Spline->Interface(true);
 }
 
 void  mainWindow::on_modifySpline_clicked(){
-    mode = 8;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(!Spline->interface)
-        Spline->Interface(true);
+    setMode(8);
 }
 
 void  mainWindow::on_deleteSpline_clicked(){
-    mode = 9;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(!Spline->interface)
-        Spline->Interface(true);
+    setMode(9);
 }
 
-void  mainWindow::on_floodFill_clicked(){
-    mode = 10;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
+void  mainWindow::on_floodFillButton_clicked(){
+    setMode(10);
 }
 
-void  mainWindow::on_scanLine_clicked(){
-    mode = 11;
-
-    if(Bezier->interface)
-        Bezier->Interface(false);
-    if(Spline->interface)
-        Spline->Interface(false);
+void  mainWindow::on_scanLineButton_clicked(){
+    setMode(11);
 }
 
+void  mainWindow::on_slider1_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(1, value);
+    update();
+}
+
+void  mainWindow::on_slider2_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(2, value);
+    update();
+}
+
+void  mainWindow::on_slider3_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(3, value);
+    update();
+}
+
+void  mainWindow::on_slider4_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(4, value);
+    update();
+}
+
+void  mainWindow::on_slider5_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(5, value);
+    update();
+}
+
+void  mainWindow::on_slider6_sliderMoved(int value){
+    setMode(0);
+    ColorPresentation->present(6, value);
+    update();
+}
+
+
+void mainWindow::on_alphaValue_sliderMoved(int value){
+    layers[selectedLayer].updateLayer(value, static_cast<blending>(ui->blendingMode->currentIndex()));
+    cleanWindow();
+    layers[0].getImage(layerNumber, layers, img);
+    update();
+}
+
+void mainWindow::on_blendingMode_currentIndexChanged(int value){
+    layers[selectedLayer].updateLayer(ui->alphaValue->value(), static_cast<blending>(value));
+    cleanWindow();
+    layers[0].getImage(layerNumber, layers, img);
+    update();
+}
+
+void mainWindow::on_listWidget_currentRowChanged(int i){
+    selectedLayer = i;
+    ui->alphaValue->setValue((int)100*layers[i].alpha);
+    ui->blendingMode->setCurrentIndex(static_cast<int>(layers[i].mode));
+}
+
+void mainWindow::imageProcessing(mm morfologyType){
+    mode = 0;
+    morfology::draw(morfologyType, kernelType, primaryColor, secondaryColor, img);
+    update();
+}
+
+void mainWindow::on_crossBox_clicked(){
+    kernelType = cross;
+}
+
+void mainWindow::on_cubeBox_clicked(){
+    kernelType = cube;
+}
+
+void mainWindow::on_erosionButton_clicked(){
+    imageProcessing(erosion);
+}
+
+void mainWindow::on_dilationButton_clicked(){
+    imageProcessing(dilation);
+}
+
+void mainWindow::on_openingButton_clicked(){
+    imageProcessing(opening);
+}
+
+void mainWindow::on_closingButton_clicked(){
+    imageProcessing(closing);
+}
+
+void mainWindow::chooseTransformation(int i, int value){
+    cleanWindow();
+    if(i == 0)
+        transform->translocation(value, ui->translationSlider2->value());
+    else if(i == 1)
+        transform->translocation(ui->translationSlider->value(), value);
+    else if(i == 2)
+        transform->rotating(value);
+    else if(i == 3)
+        transform->scalling(value, ui->scalingSlider2->value());
+    else if(i == 4)
+        transform->scalling(ui->scalingSlider->value(), value);
+    else if(i == 5)
+        transform->shearing(value, ui->shearingSlider2->value());
+    else if(i == 6)
+        transform->shearing(ui->shearingSlider->value(), value);
+
+    update();
+}
+
+void mainWindow::on_translationSlider_sliderMoved(int value){
+    chooseTransformation(0, value);
+}
+void mainWindow::on_translationSlider2_sliderMoved(int value){
+    chooseTransformation(1, value);
+}
+void mainWindow::on_rotationSlider_sliderMoved(int value){
+    chooseTransformation(2, value);
+}
+void mainWindow::on_scalingSlider_sliderMoved(int value){
+    chooseTransformation(3, value);
+}
+void mainWindow::on_scalingSlider2_sliderMoved(int value){
+    chooseTransformation(4, value);
+}
+void mainWindow::on_shearingSlider_sliderMoved(int value){
+    chooseTransformation(5, value);
+}
+void mainWindow::on_shearingSlider2_sliderMoved(int value){
+    chooseTransformation(6, value);
+}
+void mainWindow::on_resetButton_clicked(){
+     ui->translationSlider2->setValue(0);
+     ui->translationSlider->setValue(0);
+     ui->scalingSlider2->setValue(500);
+     ui->scalingSlider->setValue(500);
+     ui->rotationSlider->setValue(0);
+     ui->shearingSlider->setValue(0);
+     ui->shearingSlider2->setValue(0);
+
+     cleanWindow();
+     transform -> reset();
+     update();
+}
 
 
 /////mouse tracking
@@ -261,124 +418,108 @@ void  mainWindow::on_scanLine_clicked(){
 void mainWindow::mousePressEvent(QMouseEvent *event){
     isPressed = true;
 
-    x0 = event->x() - poczX;
-    y0 = event->y() - poczY;
+    P0.x = event->x() - poczX;
+    P0.y = event->y() - poczY;
 
     if(mode == 5){
-        Bezier->copy_x0 = x0;
-        Bezier->copy_y0 = y0;
+        Bezier->copy_x0 = P0.x;
+        Bezier->copy_y0 = P0.y;
     }
     if(mode == 8){
-        Spline->copy_x0 = x0;
-        Spline->copy_y0 = y0;
+        Spline->copy_x0 = P0.x;
+        Spline->copy_y0 = P0.y;
     }
 
     cpyImg(&imgCopy,img);
 }
 
 void mainWindow::mouseMoveEvent(QMouseEvent *event){
-    x1 = event->x() - poczX;
-    y1 = event->y() - poczY;
+    P1.x = event->x() - poczX;
+    P1.y = event->y() - poczY;
 
     if(mode == 0){
         if(isPressed){
             if(clickedIntoWindow()){
-                paintPixels(x1, y1);
+                paintPixels(P1.x, P1.y);
             }
         }
     }
     else if(mode == 1){
         if(isPressed){
             cpyImg(img, &imgCopy);
-            Line->draw();
+            Line->draw(P0, P1);
         }
     }
     else if(mode == 2){
         if(isPressed){
             cpyImg(img, &imgCopy);
-            Circle->draw();
+            Circle->draw(P0, P1);
         }
     }
     else if(mode == 3){
         if(isPressed){
             cpyImg(img, &imgCopy);
-            Polygon->draw();
+            Polygon->draw(P0, P1);
         }
     }
     else if(mode == 5 && clickedIntoWindow()){
         if(isPressed){
             cpyImg(img, &imgCopy);
-            Bezier->modifyBezier();
+            Bezier->modifyBezier(P0, P1, isPressed);
         }
     }
     else if(mode == 8 && clickedIntoWindow()){
         if(isPressed){
             cpyImg(img, &imgCopy);
-            Spline->modify();
+            Spline->modify(P0, P1, isPressed);
         }
     }
     update();
 }
 
 void mainWindow::mouseReleaseEvent(QMouseEvent *event){
-    x1 = event->x() - poczX;
-    y1 = event->y() - poczY;
+    P1.x = event->x() - poczX;
+    P1.y = event->y() - poczY;
     isPressed = false;
 
     if(mode == 1)
-        Line -> draw();
+        Line -> draw(P0, P1);
     else if(mode == 2)
-        Circle -> draw();
+        Circle -> draw(P0, P1);
     else if(mode == 3)
-        Polygon -> draw();
-    else if(mode == 4){
-        Bezier->Interface(false);
-        Bezier -> addControlPoint();
-        Bezier->Interface(true);
-    }
-    else if(mode == 5 && clickedIntoWindow() && !Bezier -> control_points.empty()){
-        Bezier -> modifyBezier();
-    }
-    else if(mode == 6 && clickedIntoWindow() && !Bezier -> control_points.empty()){
-        Bezier->Interface(false);
-        Bezier -> deleteBezier();
-        Bezier->Interface(true);
-    }
-    else if(mode == 7){
-        Spline->Interface(false);
-        Spline->addControlPoint();
-        Spline->Interface(true);
-    }
-    else if(mode == 8 && clickedIntoWindow() && !Spline -> control_points.empty()){
-        Spline -> modify();
-    }
-    else if(mode == 9 && clickedIntoWindow() && !Spline -> control_points.empty()){
-        Spline->Interface(false);
-        Spline->del();
-        Spline->Interface(true);
-    }
+        Polygon -> draw(P0, P1);
+    else if(mode == 4)
+        Bezier -> addControlPoint(P0, P1);
+    else if(mode == 5 && clickedIntoWindow() && !Bezier -> control_points.empty())
+        Bezier -> modifyBezier(P0, P1, isPressed);
+    else if(mode == 6 && clickedIntoWindow() && !Bezier -> control_points.empty())
+        Bezier -> deleteBezier(P1);
+    else if(mode == 7)
+        Spline->addControlPoint(P0, P1);
+    else if(mode == 8 && clickedIntoWindow() && !Spline -> control_points.empty())
+        Spline -> modify(P0, P1, isPressed);
+    else if(mode == 9 && clickedIntoWindow() && !Spline -> control_points.empty())
+        Spline->del(P1);
     else if(mode == 10 && clickedIntoWindow())
-        Fulfill->draw(x1, y1, mode, img->bits());
+        Fulfill->draw(P1, img->bits());
     else if(mode == 11 && clickedIntoWindow())
-        Fulfill->draw(x1, y1, mode, img->bits());
+        FullPolygon->draw(P1);
 
-    x0 = -1;
-    y0 = -1;
-    x1 = -1;
-    y1 = -1;
+    P0 = {-1, -1};
+    P1 = {-1, -1};
 
     update();
 }
 
-bool mainWindow::clickedIntoWindow(std::pair<int, int> P){
-    if(P.first >= 0 && P.second >= 0 && P.first < szer && P.second < wys)
+bool mainWindow::clickedIntoWindow(Point P){
+    if(P.x >= 0 && P.y >= 0 && P.x < szer && P.y < wys)
         return true;
     else
         return false;
 }
 
 bool mainWindow::clickedIntoWindow(){
-    if(clickedIntoWindow({x0, y0}) && clickedIntoWindow({x1, y1}))
+    if(clickedIntoWindow(P0) && clickedIntoWindow(P1))
         return true;
     else
         return false;

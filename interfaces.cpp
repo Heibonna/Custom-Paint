@@ -12,7 +12,7 @@ void toolBezierCurve::Interface(bool visible){
             imgEditor = *(w->img);
 
         Color clr_tmp = w->primaryColor;
-        unsigned long a = *x0, b = *x1, c = *y0, d = *y1;
+        int x0, x1, y0, y1;
 
         for(unsigned long i = 0; i < control_points.size(); i++){
             for(unsigned long j = 0; j < control_points[i].size(); j++){
@@ -21,27 +21,30 @@ void toolBezierCurve::Interface(bool visible){
                 else
                     w->primaryColor = "green";
 
-                *x0 = control_points[i][j].first;
-                *y0 = control_points[i][j].second;
-                *x1 = control_points[i][j].first+5;
-                *y1 = control_points[i][j].second+5;
-                w->Circle->draw();
+                x0 = control_points[i][j].x;
+                y0 = control_points[i][j].y;
+                x1 = control_points[i][j].x+5;
+                y1 = control_points[i][j].y+5;
 
-                if((j==0 || (j-1)%3 != 0) && j != control_points[i].size()-1)
-                        w->Line->draw({control_points[i][j].first,control_points[i][j].second}, {control_points[i][j+1].first, control_points[i][j+1].second});
+                w->Circle->draw({x0, y0}, {x1, y1});
+
+                if((j==0 || (j-1)%3 != 0) && j != control_points[i].size()-1){
+                    x0 = control_points[i][j].x;
+                    y0 = control_points[i][j].y;
+                    x1 = control_points[i][j+1].x;
+                    y1 = control_points[i][j+1].y;
+                    w->Line->draw({x0,y0}, {x1, y1});
+                }
 
                 w->primaryColor = clr_tmp;
-                *x0 = control_points[i][j].first;
-                *y0 = control_points[i][j].second;
-                *x1 = control_points[i][j].first+3;
-                *y1 = control_points[i][j].second+3;
-                w->Circle->draw();
+
+                x0 = control_points[i][j].x;
+                y0 = control_points[i][j].y;
+                x1 = control_points[i][j].x+3;
+                y1 = control_points[i][j].y+3;
+                w->Circle->draw({x0, y0}, {x1,y1});
             }
         }
-        *x0 = a;
-        *x1 = b;
-        *y0 = c;
-        *y1 = d;
     }
     else if(!visible && !imgEditor.isNull()){
         *(w->img) = imgEditor;
@@ -60,7 +63,7 @@ void toolBSpline::Interface(bool visible){
             imgEditor = *(w->img);
 
         Color clr_tmp = w->primaryColor;
-        unsigned long a = *x0, b = *x1, c = *y0, d = *y1;
+        int x0, x1, y0, y1;
 
         for(unsigned long i = 0; i < control_points.size(); i++){
             for(unsigned long j = 0; j < control_points[i].size(); j++){
@@ -69,27 +72,30 @@ void toolBSpline::Interface(bool visible){
                 else
                     w->primaryColor = "red";
 
-                *x0 = control_points[i][j].first;
-                *y0 = control_points[i][j].second;
-                *x1 = control_points[i][j].first+5;
-                *y1 = control_points[i][j].second+5;
-                w->Circle->draw();
+                x0 = control_points[i][j].x;
+                y0 = control_points[i][j].y;
+                x1 = control_points[i][j].x+5;
+                y1 = control_points[i][j].y+5;
 
-                if((j==0 || (j-1)%3 != 0) && j != control_points[i].size()-1)
-                        w->Line->draw({control_points[i][j].first,control_points[i][j].second}, {control_points[i][j+1].first, control_points[i][j+1].second});
+                w->Circle->draw({x0, y0}, {x1, y1});
+
+                if((j==0 || (j-1)%3 != 0) && j != control_points[i].size()-1){
+                    x0 = control_points[i][j].x;
+                    y0 = control_points[i][j].y;
+                    x1 = control_points[i][j+1].x;
+                    y1 = control_points[i][j+1].y;
+                    w->Line->draw({x0,y0}, {x1, y1});
+                }
 
                 w->primaryColor = clr_tmp;
-                *x0 = control_points[i][j].first;
-                *y0 = control_points[i][j].second;
-                *x1 = control_points[i][j].first+3;
-                *y1 = control_points[i][j].second+3;
-                w->Circle->draw();
+
+                x0 = control_points[i][j].x;
+                y0 = control_points[i][j].y;
+                x1 = control_points[i][j].x+3;
+                y1 = control_points[i][j].y+3;
+                w->Circle->draw({x0, y0}, {x1,y1});
             }
         }
-        *x0 = a;
-        *x1 = b;
-        *y0 = c;
-        *y1 = d;
     }
     else if(!visible && !imgEditor.isNull()){
         *(w->img) = imgEditor;
@@ -98,8 +104,3 @@ void toolBSpline::Interface(bool visible){
     w->update();
 
 }
-
-
-void toolLine::Interface(bool){}
-void toolCircle::Interface(bool){}
-void toolPolygon::Interface(bool){}

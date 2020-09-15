@@ -9,9 +9,7 @@ friend class mainWindow;
 public:
     toolLine(mainWindow*);
 
-    void draw(std::pair<int,int>,std::pair<int,int>);
-    void draw() override;
-    void Interface(bool active) override;
+    void draw(Point P0, Point P1);
 };
 
 #endif // TOOLLINE_H

@@ -6,90 +6,15 @@
 #include <vector>
 #include <stdlib.h>
 
+#include "structures.h"
+#include "morfology.h"
+
 #include <QMainWindow>
 #include <QPainter>
 #include <QImage>
+#include <QWidget>
 #include <QMouseEvent>
 #include <QSpinBox>
-
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
-
-#ifndef Color
-struct Color
-{
-    int red = 0;
-    int green = 0;
-    int blue = 0;
-    int alpha = 255;
-
-    Color& operator=(const std::string& rhs){
-            if(rhs == "red"){
-                red = 255;
-                green = 0;
-                blue = 0;
-            }
-            else if(rhs == "green"){
-                red = 0;
-                green = 255;
-                blue = 0;
-            }
-            else if(rhs == "blue"){
-                red = 0;
-                green = 0;
-                blue = 255;
-            }
-            else if(rhs == "black"){
-                red = 0;
-                green = 0;
-                blue = 0;
-            }
-            else if(rhs == "white"){
-                red = 255;
-                green = 255;
-                blue = 255;
-            }
-            return *this;
-    }
-
-    bool operator==(const Color& rhs){
-        return (this->red == rhs.red && this->green == rhs.green &&
-                this->blue == rhs.blue && this->alpha == rhs.alpha);
-    }
-    bool operator==(const std::string& rhs){
-        if(rhs == "red"){
-            return (this->red == 255 && this->green == 0 &&
-                this->blue == 0 && this->alpha == 255);
-        }
-        else if(rhs == "green"){
-            return (this->red == 0 && this->green == 255 &&
-                this->blue == 0 && this->alpha == 255);
-        }
-        else if(rhs == "blue"){
-            return (this->red == 0 && this->green == 0 &&
-                this->blue == 255 && this->alpha == 255);
-        }
-        else if(rhs == "black"){
-            return (this->red == 0 && this->green == 0 &&
-                this->blue == 0 && this->alpha == 255);
-        }
-        else if(rhs == "white"){
-            return (this->red == 255 && this->green == 255 &&
-                this->blue == 255 && this->alpha == 255);
-        }
-        else
-            return false;
-    }
-    bool operator!=(const Color& rhs){
-        return !(*this == rhs);
-    }
-    bool operator!=(const std::string& rhs){
-        return !(*this == rhs);
-    }
-
-};
-#endif
 
 class tools;
 class toolLine;
@@ -99,6 +24,10 @@ class toolBezierCurve;
 class toolBSpline;
 class toolsInterfaces;
 class toolFulfill;
+class toolFulfilledPolygon;
+class colorPresentation;
+class layer;
+class transformations;
 
 namespace Ui {
     class mainWindow;
@@ -114,6 +43,10 @@ class mainWindow : public QMainWindow {
     friend class toolBSpline;
     friend class toolsInterfaces;
     friend class toolFulfill;
+    friend class toolFulfilledPolygon;
+    friend class colorPresentation;
+    friend class layer;
+    friend class transformations;
 public:
     explicit mainWindow(QWidget *parent = 0);
 
@@ -130,6 +63,9 @@ protected:
     toolBezierCurve *Bezier;
     toolBSpline *Spline;
     toolFulfill *Fulfill;
+    toolFulfilledPolygon *FullPolygon;
+    colorPresentation *ColorPresentation;
+    transformations *transform;
 
     //window properties
     int szer;
@@ -141,18 +77,31 @@ protected:
     int isPressed;
     Color primaryColor;
     Color secondaryColor;
-    int mode;       //0-pen, 1-line, 2-circle, 3-polygon, 4-addBezier, 5-modifyBezier, 6-removeBezier
+    int mode;                       //0-pen, 1-line, 2-circle, 3-polygon, 4-6-bezier, 7-9-Splice, 10-floodFill, 11-scanLine
 
+    //blending
+    const int layerNumber = 3;
+    layer* layers;
+
+public:
+    void cleanWindow();
     void paintPixels(int x, int y);
     void paintPixels(int x, int y, Color color);
-    void cpyImg(QImage* src, QImage* cpy);
 
     //specialised
-    int x0, y0, x1, y1;
+    Point P0, P1;
     int polygonVertices;
+    int selectedLayer = 0;
+    kernel kernelType;
 
     //methods
     void czysc();
+    void updateInterfaces(bool Bezier, bool B_Spline);
+    void updateInterfaces();
+    void bezierInterface();
+    void splineInterface();
+    void setMode(int mode);
+    void imageProcessing(mm morfologyType);
 
     //controlers
     void mousePressEvent(QMouseEvent *event);
@@ -160,19 +109,25 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent*);
 
-    bool clickedIntoWindow(std::pair<int, int>);
+    bool clickedIntoWindow(Point);
     bool clickedIntoWindow();
+    void cpyImg(QImage* cpy, QImage* src);
+    void chooseTransformation(int i, int value);
 
 private slots:
     void on_cleanButton_clicked();
     void on_penButton_clicked();
     void on_lineButton_clicked();
-    void on_exitButton_clicked();
     void on_blackButton_clicked();
     void on_whiteButton_clicked();
     void on_redButton_clicked();
     void on_greenButton_clicked();
     void on_blueButton_clicked();
+    void on_blackBackgroundButton_clicked();
+    void on_whiteBackgroundButton_clicked();
+    void on_redBackgroundButton_clicked();
+    void on_greenBackgroundButton_clicked();
+    void on_blueBackgroundButton_clicked();
     void on_circleButton_clicked();
     void on_polygonButton_clicked();
     void on_spinBox_valueChanged(int);
@@ -182,8 +137,31 @@ private slots:
     void on_addSpline_clicked();
     void on_modifySpline_clicked();
     void on_deleteSpline_clicked();
-    void on_scanLine_clicked();
-    void on_floodFill_clicked();
+    void on_scanLineButton_clicked();
+    void on_floodFillButton_clicked();
+    void on_slider1_sliderMoved(int);
+    void on_slider2_sliderMoved(int);
+    void on_slider3_sliderMoved(int);
+    void on_slider4_sliderMoved(int);
+    void on_slider5_sliderMoved(int);
+    void on_slider6_sliderMoved(int);
+    void on_alphaValue_sliderMoved(int);
+    void on_blendingMode_currentIndexChanged(int);
+    void on_listWidget_currentRowChanged(int);
+    void on_crossBox_clicked();
+    void on_cubeBox_clicked();
+    void on_erosionButton_clicked();
+    void on_dilationButton_clicked();
+    void on_openingButton_clicked();
+    void on_closingButton_clicked();
+    void on_translationSlider_sliderMoved(int);
+    void on_translationSlider2_sliderMoved(int);
+    void on_rotationSlider_sliderMoved(int);
+    void on_scalingSlider_sliderMoved(int);
+    void on_scalingSlider2_sliderMoved(int);
+    void on_shearingSlider_sliderMoved(int);
+    void on_shearingSlider2_sliderMoved(int);
+    void on_resetButton_clicked();
 };
 
 #endif // MAINWINDOW_H

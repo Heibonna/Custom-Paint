@@ -10,8 +10,7 @@ friend class mainWindow;
 public:
     toolPolygon(mainWindow*);
 
-    void draw() override;
-    void Interface(bool active) override;
+    void draw(Point P0,Point P1);
 };
 
 #endif // TOOLPOLYGON_H

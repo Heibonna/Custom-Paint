@@ -1,5 +1,6 @@
-#include "toolFulfill.h"
+﻿#include "toolFulfill.h"
 #include <stack>
+#include <typeinfo>
 
 toolFulfill::toolFulfill(mainWindow* w)
     :tools(w)
@@ -7,8 +8,6 @@ toolFulfill::toolFulfill(mainWindow* w)
    oldColor = "white";
    img = new unsigned char(sizeof (w->img->bits()));
 }
-
-void toolFulfill::Interface(bool){};
 
 Color toolFulfill::getColor(int x, int y){
     Color pixelColor;
@@ -21,24 +20,19 @@ Color toolFulfill::getColor(int x, int y){
     return pixelColor;
 }
 
-void toolFulfill::draw(){
-    draw(w->x1, w->y1, w->mode, w->img->bits());
-}
-
-void toolFulfill::draw(int x, int y, int mode, unsigned char* bits){
+void toolFulfill::draw(Point P1, unsigned char* bits){
     img = bits;
+    int x = P1.x, y = P1.y;
+
     oldColor = getColor(x, y);
 
-    if(mode == 10)
-        floodFill(x, y);
-    else if(mode == 11)
-        scanLine(x, y);
+    floodFill(x, y);
 }
 
 void toolFulfill::floodFill(int x, int y){
     std::stack<std::pair<int,int>> stack;
 
-    if(getColor(x,y) != oldColor) return;
+    if(getColor(x,y) != oldColor || oldColor == w->primaryColor) return;
 
     stack.push({x,y});
 
@@ -47,29 +41,27 @@ void toolFulfill::floodFill(int x, int y){
         y = stack.top().second;
         stack.pop();
 
-        if(getColor(x,y) == oldColor){
-            int x1 = x, x2 = x;
-            while(getColor(x1, y) == oldColor && x1 > 0){
-                x1--;
-            }
-            while(getColor(x2,y) == oldColor && x2 < w->szer){
-                x2++;
-            }
-            for(int i = x1; i < x2; i++){
-                std::cout << i << std::endl;
-                w->paintPixels(i, y);
-            }
-            for(int i = x1; i < x2; i++){
-                if(getColor(i,y+1) == oldColor && y <= w->wys)
-                    stack.push({i, y+1});
-                if(getColor(i,y-1) == oldColor && y >= 0)
-                    stack.push({i, y-1});
-            }
+        if(getColor(x,y) != oldColor){
+            continue;
         }
+
+        int x1 = x, x2 = x;
+        if(x1 > 0)
+             while(getColor(x1-1, y) == oldColor && x1 > 0)
+                 x1--;
+        if(x2 < w->szer -1)
+            while(getColor(x2+1,y) == oldColor && x2 < w->szer - 1)
+                x2++;
+         for(int i = x1; i <= x2; i++){
+             w->paintPixels(i, y);
+
+             if(y < w->wys -1)
+                 if(getColor(i,y+1) == oldColor)
+                     stack.push({i, y+1});
+             if(y > 0)
+                 if(getColor(i,y-1) == oldColor)
+                     stack.push({i, y-1});
+         }
     }
     return;
-}
-
-void toolFulfill::scanLine(int, int){
-
 }
